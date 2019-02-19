@@ -2,6 +2,7 @@ const MATCHINTERVAL = 1000;
 const PORT = 7376;
 
 /*ssl server settings*/
+var fs = require("fs");
 var privatekey = fs.readFileSync('/etc/letsencrypt/live/omoku.net/privkey.pem').toString();
 var cert = fs.readFileSync('/etc/letsencrypt/live/omoku.net/cert.pem').toString();
 var ca = fs.readFileSync('/etc/letsencrypt/live/omoku.net/fullchain.pem').toString();
@@ -15,8 +16,8 @@ var mysql = require("mysql");
 var db = mysql.createPool({
     connectionLimit:200,
     host:'localhost',
-    user:'root',
-    password:'wang0321!',
+    user:'omoku',
+    password:'wjdgml11!',
     database:'omoku'
 });
 
