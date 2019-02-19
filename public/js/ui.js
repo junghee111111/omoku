@@ -166,6 +166,20 @@ $("section.gameBoard").click(function () {
     $(".chatInputBalloon").fadeOut();
   }
 });
+$("#loginform>button.signup").click(function () {
+  $("#loginform").hide();
+  $("#registerform").fadeIn();
+  $("#loginformWrapper").animate({
+    'top': "225px"
+  }, 500);
+});
+$("#registerform>button.signup.back").click(function () {
+  $("#registerform").hide();
+  $("#loginform").fadeIn();
+  $("#loginformWrapper").animate({
+    'top': "260px"
+  }, 500);
+});
 /*
 window.onbeforeunload = function (e) {
     e = e || window.event;

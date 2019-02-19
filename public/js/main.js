@@ -95,7 +95,8 @@
 
 var gSTATUS;
 var socket;
-var UI_loginForm, UI_submitBtnNormalDOM, UI_submitBtn;
+var UI_loginForm, UI_LoginSubmitBtnNormalDOM, UI_LoginSubmitBtn;
+var UI_RegisterForm, UI_RegisterSubmitBtnNormalDOM, UI_RegisterSubmitBtn;
 var auth;
 var room;
 var enemy;
@@ -128,6 +129,7 @@ function showToast(message) {
   var icon = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "fa-spinner";
   var spin = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
   var double = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  var opacity = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0.5;
   $(".overlay").show();
   $(".overlay>.Toast").show();
   $(".overlay>.Toast>span").html(message); //Class processing
@@ -142,6 +144,7 @@ function showToast(message) {
   }
 
   spin ? $(".overlay>.Toast>i").addClass("spin") : "";
+  $(".overlay").css("background-color", "rgba(0,0,0," + opacity + ")");
 }
 
 function showModal() {
@@ -152,6 +155,8 @@ function showModal() {
   };
   var icon = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : "fas fa-question-circle";
   var spin = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+  var opacity = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : 0.5;
+  $(".overlay").css("background-color", "rgba(0,0,0," + opacity + ")");
   $(".overlay").show();
   $(".overlay>.Modal").show();
   $(".overlay>.Modal>span").html(message);
@@ -376,8 +381,11 @@ jQuery(document).ready(function () {
     showToast("Initializing.."); //main init
 
     UI_loginForm = $("#loginform");
-    UI_submitBtn = UI_loginForm.find("button[type='submit']");
-    UI_submitBtnNormalDOM = UI_submitBtn.html();
+    UI_LoginSubmitBtn = UI_loginForm.find("button[type='submit']");
+    UI_LoginSubmitBtnNormalDOM = UI_LoginSubmitBtn.html();
+    UI_RegisterForm = $("#registerform");
+    UI_RegisterSubmitBtn = UI_RegisterForm.find("button[type='submit']");
+    UI_RegisterSubmitBtnNormalDOM = UI_RegisterSubmitBtn.html();
 
     proccessPurchasesData = function proccessPurchasesData(data) {
       var DOM = '';
@@ -423,12 +431,13 @@ jQuery(document).ready(function () {
       } else {
         $("section.login").fadeIn();
         hideToast();
+        doOnOrientationChange();
       }
 
       refreshPingData(data);
     };
 
-    AJAX_API_PING(afterPing); //ajax
+    AJAX_API_PING(afterPing); //ajax login
 
     var loginFormSettings = {
       dataType: 'json',
@@ -436,7 +445,15 @@ jQuery(document).ready(function () {
       beforeSubmit: procLoginBeforeSubmit,
       error: procAjaxError
     };
-    UI_loginForm.ajaxForm(loginFormSettings);
+    UI_loginForm.ajaxForm(loginFormSettings); //ajax register
+
+    var registerFormSettings = {
+      dataType: 'json',
+      success: procRegisterSuccess,
+      beforeSubmit: procRegisterBeforeSubmit,
+      error: procRegisterError
+    };
+    UI_RegisterForm.ajaxForm(registerFormSettings);
   }
 });
 
@@ -452,9 +469,8 @@ function procLoginSuccess(data) {
       m = "알 수 없는 에러";
     }
 
-    reviveForm;
     alert(m);
-    reviveForm(UI_submitBtn, UI_submitBtnNormalDOM);
+    reviveForm(UI_LoginSubmitBtn, UI_LoginSubmitBtnNormalDOM);
     return false;
   }
 }
@@ -462,12 +478,75 @@ function procLoginSuccess(data) {
 function procLoginBeforeSubmit() {
   var email = $("#loginform input[type='email']").val();
   var password = $("#loginform input[type='password']").val();
-  disableForm(UI_submitBtn, "요청 중..");
+  disableForm(UI_LoginSubmitBtn, "요청 중..");
 
   if (!email || !password) {
     alert("이메일과 비밀번호를 모두 입력하세요.");
-    reviveForm(UI_submitBtn, UI_submitBtnNormalDOM);
+    reviveForm(UI_LoginSubmitBtn, UI_LoginSubmitBtnNormalDOM);
     return false;
+  }
+}
+
+function procRegisterSuccess(data) {
+  if (data.success) {
+    top.location.href = "/";
+  } else {
+    reviveForm(UI_RegisterSubmitBtn, UI_RegisterSubmitBtnNormalDOM);
+    return false;
+  }
+}
+
+function procRegisterBeforeSubmit() {
+  disableForm(UI_RegisterSubmitBtn, "요청 중..");
+}
+
+function procRegisterError(error) {
+  var stack;
+  stack = "서버 에러 발생 : [" + error.status + "]" + error.statusText;
+
+  if (error.responseText.message) {
+    stack += "\n" + error.responseText.message;
+  }
+
+  console.log("Server Side ERROR Detected!");
+  console.log("상태코드 : " + error.status);
+  console.log("상태메세지 : " + error.statusText);
+  console.log("응답메시지 : " + error.responseText);
+  reviveForm(UI_RegisterSubmitBtn, UI_RegisterSubmitBtnNormalDOM);
+
+  if (error.status == '422') {
+    var message = "아래 사항을 수정해 주세요!\n-";
+    var errObj = JSON.parse(error.responseText);
+
+    if (errObj.errors.email) {
+      if (errObj.errors.email.includes("validation.unique")) {
+        message += "\n이미 가입된 이메일입니다.";
+      }
+    }
+
+    if (errObj.errors.name) {
+      if (errObj.errors.name.includes("validation.unique")) {
+        message += "\n해당 닉네임은 이미 사용되고 있습니다.";
+      }
+
+      if (errObj.errors.name.includes("validation.max.string")) {
+        message += "\n닉네임이 너무 깁니다. (6자 이하)";
+      }
+    }
+
+    if (errObj.errors.password) {
+      if (errObj.errors.password.includes("validation.min.string")) {
+        message += "\n비밀번호가 너무 짧습니다. (8자 이상)";
+      }
+
+      if (errObj.errors.password.includes("validation.confirmed")) {
+        message += "\n비밀번호와 비밀번호 확인이 일치하지 않습니다.";
+      }
+    }
+
+    alert(message);
+  } else {
+    alert(stack);
   }
 }
 
@@ -480,7 +559,7 @@ function procAjaxError(error) {
   }
 
   alert(stack);
-  reviveForm(UI_submitBtn, UI_submitBtnNormalDOM);
+  reviveForm(UI_LoginSubmitBtn, UI_LoginSubmitBtnNormalDOM);
   console.log("Server Side ERROR Detected!");
   console.log("상태코드 : " + error.status);
   console.log("상태메세지 : " + error.statusText);
@@ -1349,6 +1428,20 @@ document.addEventListener("touchmove", function (event) {
     var unitY = 12; //console.log("X : "+(touch.pageX-left)+" / Y : "+touch.pageY);
   }
 }, false);
+/*휴대폰 방향 체크 */
+
+function doOnOrientationChange() {
+  console.log(window.orientation);
+
+  if (window.orientation == 90 || window.orientation == -90) {
+    showToast("&nbsp;폰을 90도 돌려 세로 방향으로 잡아주세요!", "fa-mobile-alt", true, false, 1);
+  } else {
+    hideToast();
+  }
+}
+
+window.addEventListener('orientationchange', doOnOrientationChange);
+doOnOrientationChange();
 
 /***/ }),
 

@@ -5,16 +5,31 @@ section.ingame {
 }
 
 .bg {
-  background-image: url("/img/bg.png");
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  background-position: center -20px;
+  background: #ad5389;
+  /* fallback for old browsers */
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #3c1053, #ad5389);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   width: 100%;
   height: 101%;
   position: absolute;
   left: 0;
   top: 0;
+  z-index: -2;
+}
+
+.bg .small {
+  background-image: url("/img/bg.small.png");
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: center -20px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
   z-index: -1;
+  width: 380px;
+  height: 380px;
+  opacity: 0.5;
 }
 
 .bg.ingame {
@@ -51,7 +66,7 @@ section.ingame {
   position: absolute;
   margin: 0 5%;
   width: 90%;
-  top: 300px;
+  top: 260px;
   left: 0;
   padding: 20px;
   box-sizing: border-box;
@@ -70,6 +85,22 @@ section.ingame {
   /* fallback for old browsers */
   /* Chrome 10-25, Safari 5.1-6 */
   background: linear-gradient(to right, #f7b733, #fc4a1a);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.titlecard > form > button.green {
+  background: #B3FFAB;
+  /* fallback for old browsers */
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #07ea78, #18d9d1);
+  /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.titlecard > form > button.blue {
+  background: #00c6ff;
+  /* fallback for old browsers */
+  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to left, #0072ff, #00c6ff);
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
@@ -100,6 +131,7 @@ section.ingame {
   margin-bottom: 15px;
 }
 
+.titlecard > form > label > input[type=text],
 .titlecard > form > label > input[type=email],
 .titlecard > form > label > input[type=password] {
   display: block;

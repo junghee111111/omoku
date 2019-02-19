@@ -17,7 +17,7 @@ Route::get('/ingamedebug','IngameController@debug');
 Auth::routes();
 
 //Authentication routes
-Route::get('login','Auth\LoginController@showLoginForm')->name('login');
+//Route::get('login','Auth\LoginController@showLoginForm')->name('login');
 Route::post('login','Auth\LoginController@login');
 Route::get('auth/logout','Auth\LoginController@logout');
 Route::post('auth/changeName','Auth\UserController@changeName');

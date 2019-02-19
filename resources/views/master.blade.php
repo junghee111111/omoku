@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="viewport" content="width=380, initial-scale=1.0, shrink-to-fit=yes, minimal-ui, viewport-fit=cover">
+    <meta name="viewport" content="user-scalable=no,width=380">
+
+    <meta name="subject" content="오모쿠 :: 설치가 필요없는 온라인 오목 게임">
+    <meta name="title" content="오모쿠 :: 설치가 필요없는 온라인 오목 게임">
+    <meta name="keywords" content="오모쿠,온라인게임,오목게임,오목,온라인오목,무설치온라인오목,오목온라인,오목대전,HTML5게임,HTML5오목,io게임,오목io">
+
     <title>오모쿠 :: 설치가 필요없는 온라인 오목 게임</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="/css/reset.css"/>

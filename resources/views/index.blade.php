@@ -5,7 +5,9 @@
 @stop
 
 @section("content")
-<div class="bg"></div>
+<div class="bg">
+    <div class="small"></div>
+</div>
 <!--로비-->
 <section class="login">
     <div class="logoWrapper">
@@ -14,7 +16,7 @@
             <div class="welcomeMessage">
                 설치가 필요 없는 온라인 오목 게임
                 <br/>
-                <strong>지금 바로 시작하세요</strong>
+                <strong>10초만에 가입 후 바로 시작해 보세요!</strong>
             </div>
         </div>
     </div>
@@ -37,15 +39,16 @@
             <label>
                 <input type="checkbox" checked name="remember"> 자동 로그인
             </label>
+            <button type="submit" class="login blue"><em class="fa fa-sign-in-alt"></em> 로그인</button>
             <button class="signup" onclick="return false;"><em class="fa fa-user-plus"></em> 회원가입</button>
-            <button type="submit" class="login"><em class="fa fa-sign-in-alt"></em> 로그인</button>
+            
         </form>
         <form method="POST" id="registerform" action="{{route('register')}}" style="display:none;">
         {!! csrf_field() !!}
             <label>
                 닉네임
                 <br/>
-                <input type="text" name="name" value="{{old('name')}}" maxlength="8" required/>
+                <input type="text" name="name" value="{{old('name')}}" maxlength="6" required/>
                 <em class="fas fa-id-card"></em>
             </label>
             <label>
@@ -55,7 +58,7 @@
                 <em class="fa fa-at"></em>
             </label>
             <label>
-                비밀번호
+                비밀번호(8자 이상)
                 <br/>
                 <input type="password" name="password" required/>
                 <em class="fa fa-key"></em>
@@ -68,13 +71,14 @@
             </label>
             
             <label>
-                <input type="checkbox" name="laws" id="laws"> <a id='go_laws' href="#">이용 약관</a>을 이해했으며 동의합니다.
+                <input type="checkbox" required name="laws" id="laws"> <a id='go_laws' href="#">이용 약관</a>을 이해했으며 동의합니다.
             </label>
             <label>
-                <input type="checkbox" name="privacy" id="privacy"> <a id='go_privacy' href="#">개인정보 취급방침</a>을 이해했으며 동의합니다.
+                <input type="checkbox" required name="privacy" id="privacy"> <a id='go_privacy' href="#">개인정보 취급방침</a>을 이해했으며 동의합니다.
             </label>
+            <button type="submit" class="login green"><em class="fa fa-user-check"></em> 회원가입 요청</button>
             <button class="signup back" onclick="return false;"><em class="fa fa-arrow-left"></em> 로그인하기..</button>
-            <button type="submit" class="login"><em class="fa fa-user-check"></em> 회원가입 요청</button>
+            
         </form>
     </div>
 </section>
