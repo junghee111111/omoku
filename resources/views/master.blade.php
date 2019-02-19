@@ -31,7 +31,7 @@
     @yield("content")
     @include("footer")
 </body>
-<script src="http://121.181.13.204:7376/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="//:7376/socket.io/socket.io.js" type="text/javascript"></script>
 @yield("endbody")
 <script src="{{mix('js/ui.js')}}" type="text/javascript"></script>
 </html>
