@@ -305,7 +305,10 @@ jQuery(document).ready(function(){
             dataType:'json',
             success:procRegisterSuccess,
             beforeSubmit:procRegisterBeforeSubmit,
-            error:procRegisterError
+            error:procRegisterError,
+            headers:{
+                'X-CSRF-TOKEN' : $("input[name='_token']").val()
+            }
         }
         UI_RegisterForm.ajaxForm(registerFormSettings);
     }
