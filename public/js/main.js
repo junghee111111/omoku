@@ -573,7 +573,7 @@ function procAfterLoginChecked(data) {
   showToast("게임 서버 접속 허가 대기 중..");
 
   try {
-    socket = io("http://121.181.13.204:7376");
+    socket = io("//:7376");
   } catch (e) {
     console.log("CONNECTION FAILED");
     showToast("게임 서버에 연결할 수 없습니다.<br/>서버 점검중일 수 있습니다.", "fa-ban", false, true);

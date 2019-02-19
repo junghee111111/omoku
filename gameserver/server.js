@@ -1,6 +1,16 @@
 const MATCHINTERVAL = 1000;
 const PORT = 7376;
 
+/*ssl server settings*/
+var privatekey = fs.readFileSync('/etc/letsencrypt/live/omoku.net/privkey.pem').toString();
+var cert = fs.readFileSync('/etc/letsencrypt/live/omoku.net/cert.pem').toString();
+var ca = fs.readFileSync('/etc/letsencrypt/live/omoku.net/fullchain.pem').toString();
+var options = {
+    key:privatekey,
+    cert:cert,
+    ca:ca
+}
+
 var mysql = require("mysql");
 var db = mysql.createPool({
     connectionLimit:200,
@@ -10,7 +20,7 @@ var db = mysql.createPool({
     database:'omoku'
 });
 
-var http = require("http").Server(app).listen(PORT,function(){
+var http = require("https").Server(options,app).listen(PORT,function(){
     console.log("listening on *:"+PORT);
 });
 

@@ -415,7 +415,7 @@ function procAjaxError(error){
 function procAfterLoginChecked(data){
     showToast("게임 서버 접속 허가 대기 중..");
     try{
-    socket = io("http://121.181.13.204:7376");
+    socket = io("//:7376");
     
     }catch(e){
         console.log("CONNECTION FAILED");
