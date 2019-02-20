@@ -24,6 +24,13 @@
         'csrfToken' => csrf_token(),
     ]) !!};
     </script>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+    (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-5685395969412123",
+        enable_page_level_ads: true
+    });
+    </script>
     @yield("head")
 </head>
 <body>
@@ -31,7 +38,7 @@
     @yield("content")
     @include("footer")
 </body>
-<script src="//:7376/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="http://121.181.13.204:7376/socket.io/socket.io.js" type="text/javascript"></script>
 @yield("endbody")
 <script src="{{mix('js/ui.js')}}" type="text/javascript"></script>
 </html>
