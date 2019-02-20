@@ -1,3 +1,4 @@
+const PRODUCTION = true;
 var gSTATUS;
 var socket;
 var UI_loginForm,UI_LoginSubmitBtnNormalDOM,UI_LoginSubmitBtn;
@@ -420,7 +421,11 @@ function procAjaxError(error){
 function procAfterLoginChecked(data){
     showToast("게임 서버 접속 허가 대기 중..");
     try{
-    socket = io("https://"+window.location.hostname+":7376");
+        if(PRODUCTION){
+            socket = io("https://www.omoku.net:7376");
+        }else{
+            socket = io("//:7376");
+        }
     
     }catch(e){
         console.log("CONNECTION FAILED");
