@@ -38,7 +38,11 @@
     @yield("content")
     @include("footer")
 </body>
+<<<<<<< HEAD
 <script src="http://121.181.13.204:7376/socket.io/socket.io.js" type="text/javascript"></script>
+=======
+<script src="https://www.omoku.net:7376/socket.io/socket.io.js" type="text/javascript"></script>
+>>>>>>> 832535a76dc5b26112315b708af7ac553e7949e4
 @yield("endbody")
 <script src="{{mix('js/ui.js')}}" type="text/javascript"></script>
 </html>
