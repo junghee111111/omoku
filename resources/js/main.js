@@ -18,6 +18,11 @@ var Timeout_hideMyGameChat,Timeout_hideEnemyGameChat;
 var Timeout_hideInvite = [];
 var SELECTED_ITEM = -1;
 var proccessPurchasesData;
+const GOLD_WIN = 300;
+const GOLD_LOSE = 350;
+const GOLD_PANALTY = 400;
+const MULTIPLY = 1;
+
 /*UI Function*/
 function disableForm(target,BusyDOM){
     target.attr("disabled","disabled");
@@ -415,7 +420,7 @@ function procAjaxError(error){
 function procAfterLoginChecked(data){
     showToast("게임 서버 접속 허가 대기 중..");
     try{
-    socket = io("//:7376");
+    socket = io("//"+window.location.hostname+":7376");
     
     }catch(e){
         console.log("CONNECTION FAILED");
@@ -787,10 +792,10 @@ function allocatePacketProcessor(){
         setTimeout(function(){
             intervene("endgame");
             var h1 = "패배했습니다.";
-            h2 = '<i class="gold fa fa-dot-circle">&nbsp;120골드</i>를 잃었습니다!<br/>잠시 뒤 자동 퇴장합니다.';
+            h2 = '<i class="gold fa fa-dot-circle">&nbsp;'+GOLD_LOSE+'골드</i>를 잃었습니다!<br/>잠시 뒤 자동 퇴장합니다.';
             if(win){
                 h1 = "승리했습니다!";
-                h2 = '<i class="gold fa fa-dot-circle">&nbsp;100골드</i>를 얻었습니다!<br/>잠시 뒤 자동 퇴장합니다.';
+                h2 = '<i class="gold fa fa-dot-circle">&nbsp;'+GOLD_WIN+'골드</i>를 얻었습니다!<br/>잠시 뒤 자동 퇴장합니다.';
             }
             $(".dialog.endgame>h1[omoku-data='title']").html(h1);
             $(".dialog.endgame>h2").html(h2);
@@ -827,10 +832,10 @@ function allocatePacketProcessor(){
                         console.log("ROOMCLOSED 패킷 : 정상적인 게임 종료로 인한 퇴장..");
                     }else if(packet=="DISCONNECT"){
                         console.log("ROOMCLOSED 패킷 : 상대방의 비정상적 연결 끊김으로 강제퇴장..");
-                        alert("상대방과의 연결이 끊어졌습니다.\n상대방에겐 200골드 차감의 패널티를 부여했습니다.\n\n게임에 불편을 끼쳐 죄송합니다.");
+                        alert("상대방과의 연결이 끊어졌습니다.\n상대방에겐 "+GOLD_PANALTY+"골드 차감의 패널티를 부여했습니다.\n\n게임에 불편을 끼쳐 죄송합니다.");
                     }else if(packet=="DISCONNECTBYME"){
                         console.log("ROOMCLOSED 패킷 : 상대방의 비정상적 연결 끊김으로 강제퇴장..");
-                        alert("게임 중 퇴장 패널티로 200골드 차감되었습니다.");
+                        alert("게임 중 퇴장 패널티로 "+GOLD_PANALTY+"골드 차감되었습니다.");
                     }else if(packet=="DISCONNECTUNKNOWN"){
                         console.log("ROOMCLOSED 패킷 : 상대방의 비정상적 연결 끊김으로 강제퇴장..");
                         alert("상대방이 응답하지 않습니다.");

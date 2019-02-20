@@ -21,5 +21,4 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-/gameserver/server.js
 webpack.mix.js
