@@ -1,29 +1,38 @@
 const MATCHINTERVAL = 3000;
 const CLEANERINTERVAL = 1000;
 const PORT = 7376;
-const PRODUCTION = true;
+const PRODUCTION = false;
 /*ssl server settings*/
 
 var fs = require("fs");
-
-var privatekey = fs.readFileSync('/etc/letsencrypt/live/omoku.net/privkey.pem').toString();
-var cert = fs.readFileSync('/etc/letsencrypt/live/omoku.net/cert.pem').toString();
-var ca = fs.readFileSync('/etc/letsencrypt/live/omoku.net/fullchain.pem').toString();
-
-var options = {
-    key:privatekey,
-    cert:cert,
-    ca:ca
-}
-
 var mysql = require("mysql");
-var db = mysql.createPool({
-    connectionLimit:200,
-    host:'localhost',
-    user:'omoku',
-    password:'wjdgml11!',
-    database:'omoku'
-});
+var db;
+if(PRODUCTION){
+    var privatekey = fs.readFileSync('/etc/letsencrypt/live/omoku.net/privkey.pem').toString();
+    var cert = fs.readFileSync('/etc/letsencrypt/live/omoku.net/cert.pem').toString();
+    var ca = fs.readFileSync('/etc/letsencrypt/live/omoku.net/fullchain.pem').toString();
+
+    var options = {
+        key:privatekey,
+        cert:cert,
+        ca:ca
+    }
+    db = mysql.createPool({
+        connectionLimit:200,
+        host:'localhost',
+        user:'omoku',
+        password:'wjdgml11!',
+        database:'omoku'
+    });
+}else{
+    db = mysql.createPool({
+        connectionLimit:200,
+        host:'localhost',
+        user:'root',
+        password:'wang0321!',
+        database:'omoku'
+    });
+}
 var socketOption = {
     pingInterval: 2000,
     pingTimeout: 4000,
