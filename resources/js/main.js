@@ -424,7 +424,7 @@ function procAfterLoginChecked(data){
         if(PRODUCTION){
             socket = io("https://www.omoku.net:7376");
         }else{
-            socket = io("//:7376");
+            socket = io("//localhost:7376");
         }
     
     }catch(e){
