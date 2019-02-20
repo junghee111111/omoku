@@ -6,6 +6,10 @@ var roomProcessor = require('./room.js');
 var rooms = [];
 var db;
 var io;
+const GOLD_WIN = 300;
+const GOLD_LOSE = 350;
+const GOLD_PANALTY = 400;
+const MULTIPLY = 1;
 /*
 roomStatus
 1 - 가위바위보 상태
@@ -22,7 +26,7 @@ roomStatus
     나머지 한 플레이어도 연결이 끊어진다면 그 플레이어도 패널티
 */
 
-exports = module.exports = function(_io,MATCHINTERVAL,_db){
+exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
     db = _db;
     io = _io;
     io.on("connection",function(socket){//연결 수립
@@ -85,6 +89,16 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db){
                     }
                     if(results[0].id==userinfo.id){
                         user.userinfo = userinfo;
+
+                        var userIndex = getUserIndexBySocket(user.socket);
+                        if(userIndex==-1){
+                            disconnectPlayer(socket,"0x01/22","잘못된 유저 정보 ["+user.userinfo.name+"]",user);
+                            return;
+                        }
+
+                        users[userIndex] = user;
+                        
+                        
                         console.log(" ㄴ("+results[0].name+") 신원 확인 완료.");
 
                         if(results[0].online==1){
@@ -121,8 +135,12 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db){
 
         socket.on('disconnect',function(reason){//퇴장(HARD QUIT)
             try{
-                console.log(user.userinfo.name+" 유저가 퇴장을 시도합니다..");
-                user.lastping = moment();
+                if(user.userinfo){
+                    console.log(user.userinfo.name+" 유저가 퇴장을 시도합니다..");
+                }else{console.log("[알수없는익명] 유저가 퇴장을 시도합니다..");
+
+                }
+                //user.lastping = moment();
                 clearPlayer(user);
             }catch(e){
                 console.log(e);
@@ -377,13 +395,14 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db){
                 usersInMatch.push(users[i]);
             }
         }
+        //console.log("[매치메이커] "+usersInMatch.length+"/"+users.length+" 명 매치 대기 감지됨.");
         if(countInMatch<=1){
             //console.log("[매치메이커] "+countInMatch+"명 / 매치 인원 너무 적어서 취소.");
             return;//한명이면 취소
         }
         var rnd1 = -1;
         var rnd2 = -1;
-        console.log("[매치메이커] "+usersInMatch.length+"명 매치 대기 감지됨.");
+        
         while(rnd1==rnd2){
             rnd1 = Math.round(Math.random()*(usersInMatch.length-1));
             rnd2 = Math.round(Math.random()*(usersInMatch.length-1));
@@ -392,6 +411,52 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db){
         makeRoom(usersInMatch[rnd1],usersInMatch[rnd2]);
     
     }, MATCHINTERVAL);
+
+    /*
+    * 유저 클리너 로직
+    */
+   setInterval(function(){
+        //console.log("[USERSYNC] 게임서버 접속자와 DB를 동기화 합니다..");
+        var queryWhere = "";
+        for(var i = 0;i<users.length;i++){
+            if(users[i].userinfo){
+                queryWhere += users[i].userinfo.id+",";
+            }
+        }
+        if(users.length>0){
+            queryWhere = queryWhere.substr(0,(queryWhere.length-1));//마지막 쉼표 하나 자름..
+            var query1 = "UPDATE users SET `online` = '1' WHERE id IN ("+queryWhere+");";
+            var query2 = "UPDATE users SET `online` = '0' WHERE id NOT IN ("+queryWhere+");";
+            db.query(query1,
+            [],
+            function(error,results,fields){
+                if(error){
+                    console.log("[USERSYNC] 에러 1 "+query1+"/"+error);
+                    return;
+                }
+                db.query(query2,
+                [],
+                function(error,results,fields){
+                    if(error){
+                        console.log("[USERSYNC] 에러 2 "+query2+"/"+error);
+                        return;
+                    }
+                    //console.log("[USERSYNC] 성공");
+                });
+            });
+        }else{
+            db.query("UPDATE users SET online = '0';",[],
+            function(error,results,fields){
+                if(error){
+                    console.log("[USERSYNC] 에러 3 "+query3+"/"+error);
+                    return;
+                }
+                console.log("[USERSYNC] 사람이 없어서 전체 offline 설정");
+            });
+        }
+
+    }, CLEANERINTERVAL);
+
 }
 var rand = function() {
     return Math.random().toString(36).substr(2); // remove `0.`
@@ -424,6 +489,14 @@ function makeRoom(userObj1,userObj2){
 function getUserIndexbyId(id){
     for(var i=0;i<users.length;i++){
         if(users[i]!=null&&(users[i].userinfo.id == id)){
+            return i;
+        }
+    }
+    return -1;
+}
+function getUserIndexBySocket(socket){
+    for(var i=0;i<users.length;i++){
+        if(users[i]!=null&&(users[i].socket == socket)){
             return i;
         }
     }
@@ -578,7 +651,7 @@ function processPlace(io,db,ridx,user,posX,posY){
             var loser = rooms[ridx].players[theOp(rooms[ridx].current)].userinfo.id;
             
             var QUERY_UPDATE_WINNER_RECORD = 
-            db.query("UPDATE users SET `gold` = `gold`+100 , `wins` = `wins`+1 WHERE `id` = '?';",
+            db.query("UPDATE users SET `gold` = `gold`+"+gold("WIN")+" , `wins` = `wins`+1 WHERE `id` = '?';",
             [winner],
             function(error,results,fields){
                 if(error){
@@ -586,7 +659,7 @@ function processPlace(io,db,ridx,user,posX,posY){
                 }
 
                 var QUERY_UPDATE_LOSER_RECORD = 
-                db.query("UPDATE users SET `gold` = `gold`-120 , `loses` = `loses`+1 WHERE `id` = '?';",
+                db.query("UPDATE users SET `gold` = `gold`-"+gold("LOSE")+" , `loses` = `loses`+1 WHERE `id` = '?';",
                 [loser],
                 function(error,results,fields){
                     if(error){
@@ -642,7 +715,7 @@ function closeRoom(io,db,ridx,reason='ENDGAME',who){
     
     if(reason=="SOFTQUIT"){
         //범인 -200골드 & 전적 제거..
-        var QUERY_PUNISH = db.query("UPDATE users SET `gold` = `gold`-200, `loses` = `loses`+1 WHERE id = ?",
+        var QUERY_PUNISH = db.query("UPDATE users SET `gold` = `gold`-"+gold("PANALTY")+", `loses` = `loses`+1 WHERE id = ?",
         [rooms[ridx].players[who].userinfo.id],
         function(error,results,fields){
             if(error){
@@ -659,7 +732,7 @@ function closeRoom(io,db,ridx,reason='ENDGAME',who){
         
     }else if(reason=="DISCONNECT"){
         //범인 -200골드 & 전적 제거..
-        var QUERY_PUNISH = db.query("UPDATE users SET `gold` = `gold`-200, `loses` = `loses`+1 WHERE id = ?",
+        var QUERY_PUNISH = db.query("UPDATE users SET `gold` = `gold`-"+gold("LOSE")+", `loses` = `loses`+1 WHERE id = ?",
         [who],
         function(error,results,fields){
             if(error){
@@ -693,21 +766,27 @@ function clearPlayer(user){
     try{
         var hasRoomIndex = getRoomIndexByRoomName(user.room);
         for(var i = 0;i<users.length;i++){
-            if(users[i].userinfo.id==user.userinfo.id){
+            if(users[i].socket==user.socket){
                 var target = i;
-                var QUERY_SET_USER_OFFLINE = db.query("UPDATE users SET online = '0' WHERE id = ?",
-                [users[target].userinfo.id],
-                function(error,results,fields){
-                    if(error){
-                        console.log(users[target].userinfo.name+" 유저를 지우지 못했습니다.");
-                    }
-                    if(hasRoomIndex>-1){
-                        closeRoom(io,db,hasRoomIndex,"DISCONNECT",user.userinfo.id);
-                    }
+                if(users[target].userinfo){
+                    var QUERY_SET_USER_OFFLINE = db.query("UPDATE users SET online = '0' WHERE id = ?",
+                    [users[target].userinfo.id],
+                    function(error,results,fields){
+                        if(error){
+                            console.log(users[target].userinfo.name+" 유저를 지우지 못했습니다.");
+                        }
+                        if(hasRoomIndex>-1){
+                            closeRoom(io,db,hasRoomIndex,"DISCONNECT",user.userinfo.id);
+                        }
+                        users.splice(target,1);
+                        io.emit("COUNTER",users.length);
+                        console.log("["+users.length+"] "+user.userinfo.name+" 유저 스택에서 제거 완료");
+                    });
+                }else{
                     users.splice(target,1);
                     io.emit("COUNTER",users.length);
-                    console.log("["+users.length+"] "+user.userinfo.name+" 유저 스택에서 제거 완료");
-                });
+                    console.log("["+users.length+"] [알수없는익명] 유저 스택에서 제거 완료");
+                }
             }
         }
     }catch(e){
@@ -720,5 +799,19 @@ function theOp(who){
         return 0;
     }else{
         return 1;
+    }
+}
+
+function gold(act){
+    switch(act){
+        case "WIN":
+            return GOLD_WIN*MULTIPLY;
+        break;
+        case "LOSE":
+            return GOLD_LOSE*MULTIPLY;
+        break;
+        case "PANALTY":
+            return GOLD_PANALTY*MULTIPLY;
+        break;
     }
 }

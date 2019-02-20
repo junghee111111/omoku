@@ -1,9 +1,9 @@
-const MATCHINTERVAL = 1000;
+const MATCHINTERVAL = 3000;
+const CLEANERINTERVAL = 1000;
 const PORT = 7376;
 
-<<<<<<< HEAD
-=======
 /*ssl server settings*/
+/*
 var fs = require("fs");
 var privatekey = fs.readFileSync('/etc/letsencrypt/live/omoku.net/privkey.pem').toString();
 var cert = fs.readFileSync('/etc/letsencrypt/live/omoku.net/cert.pem').toString();
@@ -12,23 +12,25 @@ var options = {
     key:privatekey,
     cert:cert,
     ca:ca
-}
-
->>>>>>> 832535a76dc5b26112315b708af7ac553e7949e4
+}*/
 var mysql = require("mysql");
 var db = mysql.createPool({
     connectionLimit:200,
     host:'localhost',
-    user:'omoku',
-    password:'wjdgml11!',
+    user:'root',
+    password:'wang0321!',
     database:'omoku'
 });
+var socketOption = {
+    pingInterval: 2000,
+    pingTimeout: 4000,
+}
 
 var http = require("http").Server(app).listen(PORT,function(){
     console.log("listening on *:"+PORT);
 });
 
-var io = require("socket.io")(http);
+var io = require("socket.io")(http,socketOption);
 var app,packetProcessor;
 var validateUserinfo = db.query("UPDATE users SET online = '0';",[],
 function(error,results,fields){
@@ -38,6 +40,6 @@ function(error,results,fields){
     }
     console.log("DB서버에 연결 완료..");
     app = require("express")();
-    packetProcessor = require('./packetProcessor.js')(io,MATCHINTERVAL,db);
+    packetProcessor = require('./packetProcessor.js')(io,MATCHINTERVAL,db,CLEANERINTERVAL);
 });
 
