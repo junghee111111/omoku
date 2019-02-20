@@ -420,7 +420,7 @@ function procAjaxError(error){
 function procAfterLoginChecked(data){
     showToast("게임 서버 접속 허가 대기 중..");
     try{
-    socket = io("//"+window.location.hostname+":7376");
+    socket = io("https://"+window.location.hostname+":7376");
     
     }catch(e){
         console.log("CONNECTION FAILED");
