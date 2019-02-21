@@ -1,4 +1,4 @@
-const PRODUCTION = true;
+const PRODUCTION = false;
 var gSTATUS;
 var socket;
 var UI_loginForm,UI_LoginSubmitBtnNormalDOM,UI_LoginSubmitBtn;
@@ -103,6 +103,7 @@ function hideToast(){
     $(".overlay").hide();
 }
 function myTurnNotify(message="  회원님 차례입니다.",short=false,forever=false){
+    $(".gameAction").show();
     $("#myturnNotifier").find("span").html(message);
     if(short){
         $("#myturnNotifier").css("width","70%");
@@ -115,7 +116,8 @@ function myTurnNotify(message="  회원님 차례입니다.",short=false,forever
         "bottom":'0px'
     },300);
     if(!forever){
-        $("#myturnNotifier").delay(1000).animate({"bottom":"-70px"},300);
+        $("#myturnNotifier").delay(1000).animate({"bottom":"-70px"},300,function(){
+        });
     }
 }
 
@@ -718,7 +720,7 @@ function allocatePacketProcessor(){
                 if(globalTurnTimeLeft==5&&placable){
                     myTurnNotify("5초 남았습니다.",true);
                 }
-                $("*[omoku-data='turn-time-left']").html(" "+globalTurnTimeLeft+"초 남음");
+                $("*[omoku-data='turn-time-left']").html(" "+globalTurnTimeLeft+"초 남음 / 화면 아래가 잘리면 스크롤을 내리세요.");
             }else{
                 $("*[omoku-data='turn-time-left']").html(" 아무곳이나 착수합니다.");
             }

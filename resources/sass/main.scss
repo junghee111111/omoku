@@ -164,7 +164,7 @@ section.ingameBar{
     top:0;
     box-shadow:0px 5px 20px rgba(0,0,0,.2);
     left:0;
-    z-index:2;
+    z-index:3;
     .chatBalloon{
         display:inline-block;
         background-color:black;
@@ -292,11 +292,11 @@ section.ingameBar.me{
     box-shadow:0px -5px 20px rgba(0,0,0,.2);
 }
 section.gameBoard{
-    height:375px;
+    height:600px;
     width:100%;
     position:absolute;
     top:120px;
-    z-index:3;
+    z-index:2;
     left:0;
 }
 
@@ -905,7 +905,7 @@ section.lobby{
 
 section.ingame{
     aside.gameAction{
-        z-index:2;
+        z-index:3;
         position: fixed;
         bottom: 78px;
         display:block;
