@@ -326,7 +326,7 @@ function procLoginSuccess(data){
     }else{
         var m = "";
         if(data.message=="E01"){
-            m = "아이디/비밀번호가 등록된 정보와 다릅니다.";
+            m = "닉네임/비밀번호가 등록된 정보와 다릅니다.";
         }else{
             m = "알 수 없는 에러";
         }
@@ -337,13 +337,13 @@ function procLoginSuccess(data){
 }
 
 function procLoginBeforeSubmit(){
-    var email = $("#loginform input[type='email']").val();
+    var name = $("#loginform input[type='text']").val();
     var password = $("#loginform input[type='password']").val();
 
     disableForm(UI_LoginSubmitBtn,"요청 중..");
 
-    if(!email||!password){
-        alert("이메일과 비밀번호를 모두 입력하세요.");
+    if(!name||!password){
+        alert("닉네임과 비밀번호를 모두 입력하세요.");
         reviveForm(UI_LoginSubmitBtn,UI_LoginSubmitBtnNormalDOM);
         return false;
     }
@@ -527,6 +527,10 @@ function allocatePacketProcessor(){
             $("#running").hide();
             $("#matched").show();
             $(".startBtnWrapper").fadeIn(250);
+            setTimeout(function(){
+                $(".startBtn").show();
+                $("#matched").hide();
+            },4000)
         });
         $("*[omoku-data='enemy-name']").html(enemy.name);
         $("*[omoku-data='enemy-winAll']").html(enemy.wins+enemy.loses);
@@ -919,7 +923,7 @@ $("#ingameChatBody").keypress(function(event){
 });
 
 $("#chatSubmit").click(function(){
-    sendIngameChat($(this).val());
+    sendIngameChat($("#ingameChatBody").val());
 });
 $("#connectFriend").click(function(){
     hideToast();

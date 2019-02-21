@@ -289,7 +289,7 @@
             </span>
         </aside>
         <div class="chatInputBalloon">
-            <input type="text" id="ingameChatBody" maxlength="20" placeholder="여기에 메시지를 입력하세요.."/>
+            <input type="text" id="ingameChatBody" maxlength="20" placeholder="여기에 채팅 입력 후 엔터키.."/>
             <button id="chatSubmit">
                 <em class="fa fa-comment"></em>
             </button>
@@ -331,7 +331,7 @@
                 정말 나가시겠습니까?
             </h1>
             <h2 style="text-align:center;font-size:14px;line-height:150%;">
-                중도 퇴장은 <i class="gold fa fa-dot-circle"></i>&nbsp;<span class="red">200골드를 차감</span>하며<br/>
+                중도 퇴장은 <i class="gold fa fa-dot-circle"></i>&nbsp;<span class="red">400골드를 차감</span>하며<br/>
                 무조건 <span class="red">"패배"로 기록</span>됩니다.<br/>
                 <br/>
                 그래도 나가시겠습니까?

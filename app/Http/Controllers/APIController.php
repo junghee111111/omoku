@@ -21,7 +21,7 @@ class APIController extends Controller
 
     //랭킹쓰~
     public function ranking(){
-        $users = DB::table('users')->select("name","wins","loses","gold","online")->orderByRaw('`wins` DESC,(`wins`/(`wins`+`loses`)) DESC')->limit(20)->get();
+        $users = DB::table('users')->select("name","wins","loses","gold","online")->orderByRaw('`wins` DESC,(`wins`/(`wins`+`loses`)) DESC')->limit(100)->get();
         return response()->json($users);
     }
 }

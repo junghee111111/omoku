@@ -42,7 +42,7 @@ class LoginController extends Controller
 
     protected function login(Request $request){
         $this->validateLogin($request);
-        $user = User::where("email",$request->get("email"))->get();
+        $user = User::where("name",$request->get("name"))->get();
         if(isset($user[0])){
             if($user[0]->remove==1){
                 return $this->sendFailedLoginResponse($request);

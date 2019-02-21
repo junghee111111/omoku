@@ -25,9 +25,9 @@
         <form method="POST" id="loginform" action="{{route('login')}}">
         {!! csrf_field() !!}
             <label>
-                이메일
+                닉네임
                 <br/>
-                <input type="email" name="email" value="{{old('email')}}" required/>
+                <input type="text" name="name" value="{{old('name')}}" maxlength="6" required/>
                 <em class="fa fa-user-circle"></em>
             </label>
             <label>
@@ -39,24 +39,24 @@
             <label>
                 <input type="checkbox" checked name="remember"> 자동 로그인
             </label>
-            <button type="submit" class="login blue"><em class="fa fa-sign-in-alt"></em> 로그인</button>
+            <button type="submit" class="login blue"><em class="fa fa-sign-in-alt"></em> 닉네임으로 로그인</button>
             <button class="signup" onclick="return false;"><em class="fa fa-user-plus"></em> 회원가입</button>
             
         </form>
         <form method="POST" id="registerform" action="{{route('register')}}" style="display:none;">
         {!! csrf_field() !!}
             <label>
-                닉네임
+                닉네임(6자 이하)
                 <br/>
                 <input type="text" name="name" value="{{old('name')}}" maxlength="6" required/>
                 <em class="fas fa-id-card"></em>
             </label>
-            <label>
+            <!--<label>
                 이메일
                 <br/>
                 <input type="email" name="email" value="{{old('email')}}" required/>
                 <em class="fa fa-at"></em>
-            </label>
+            </label>-->
             <label>
                 비밀번호(8자 이상)
                 <br/>
@@ -70,11 +70,14 @@
                 <em class="fa fa-check"></em>
             </label>
             
-            <label>
-                <input type="checkbox" required name="laws" id="laws"> <a id='go_laws' href="#">이용 약관</a>을 이해했으며 동의합니다.
+            <label style="text-align:right;">
+                감사합니다!
             </label>
-            <label>
-                <input type="checkbox" required name="privacy" id="privacy"> <a id='go_privacy' href="#">개인정보 취급방침</a>을 이해했으며 동의합니다.
+            <label style="display:none;">
+                <input type="checkbox" required name="laws" id="laws" checked> <a id='go_laws' href="#">이용 약관</a>을 이해했으며 동의합니다.
+            </label>
+            <label style="display:none;">
+                <input type="checkbox" required name="privacy" id="privacy" checked> <a id='go_privacy' href="#">개인정보 취급방침</a>을 이해했으며 동의합니다.
             </label>
             <button type="submit" class="login green"><em class="fa fa-user-check"></em> 회원가입 요청</button>
             <button class="signup back" onclick="return false;"><em class="fa fa-arrow-left"></em> 로그인하기..</button>
@@ -203,10 +206,10 @@ if(Auth::check()){
                                 <div class="left">닉네임</div>
                                 <div class="right" omoku-data="name"><?=Auth::user()->name;?></div>
                             </li>
-                            <li>
+                            <!--<li>
                                 <div class="left">이메일</div>
                                 <div class="right"><?=Auth::user()->email;?></div>
-                            </li>
+                            </li>-->
                             <li>
                                 <div class="left">골드</div>
                                 <div class="right"><i class="gold fa fa-dot-circle" omoku-data="gold"><?=Auth::user()->gold;?></i></div>
