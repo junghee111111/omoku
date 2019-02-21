@@ -52,6 +52,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
         io.emit("COUNTER",users.length);//전체 클라에게 현재 들어온사람 쏘기
 
         socket.on('CHAT',function(chat){//채팅
+            var user = findMyUser(socket);
             try{
                 user.lastping = moment();
                 var chat = chat.substring(0,40);
@@ -70,6 +71,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
         });
 
         socket.on('HANDSHAKEADDITIONAL',function(userinfo){//핸드쉐이크
+            var user = findMyUser(socket);
             try{
                 user.lastping = moment();
 
@@ -134,6 +136,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
         });
 
         socket.on('disconnect',function(reason){//퇴장(HARD QUIT)
+            var user = findMyUser(socket);
             try{
                 if(user.userinfo){
                     console.log(user.userinfo.name+" 유저가 퇴장을 시도합니다..");
@@ -148,23 +151,27 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
         });
 
         socket.on('MATCHIN',function(reason){//매치 대기열 참여
+            var user = findMyUser(socket);
             user.lastping = moment();
             console.log("["+user.userinfo.name+"] 매치 참여");
             user.status=3;
         });
 
         socket.on('MATCHOUT',function(reason){//매치 대기열 퇴장
+            var user = findMyUser(socket);
             user.lastping = moment();
             console.log("["+user.userinfo.name+"] 매치에서 빠짐");
             user.status=2;
         });
 
         socket.on('ROOMENTER',function(packet){//최초로 게임 룸에 입장시..
+            var user = findMyUser(socket);
             user.lastping = moment();
             user.status = 4;
             //room initialize
             var roomObj = {}
             var roomIndex = getRoomIndexByRoomName(user.room);
+            console.log(user.room+" 이것으로 "+roomIndex+" 를 찾아냄");
             if(roomIndex>-1){
                 console.log("[ROOM@"+rooms[roomIndex].roomID+"] 이미 개설되어 플레이어만 추가. + "+user.userinfo.name);
                 roomAlreadyExist = true;
@@ -212,6 +219,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
         });
 
         socket.on('RSPSELECT',function(packet){//가위바위보 선택
+            var user = findMyUser(socket);
             user.lastping = moment();
             var ridx = getRoomIndexByRoomName(user.room);
             var playerIndex = getPlayerInRoomById(ridx,user.userinfo.id);
@@ -223,9 +231,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                     console.log("[룸서버@"+user.room+"]"+user.userinfo.name+"님이 "+packet+"선택");
                 }catch(e){
                     console.log("아직 룸에 유저 덜넣음..");
-                    setTimeout(function(){
-
-                    })
+                    closeRoom(io,db,ridx,"DISCONNECTUNKNOWN");
                 }
                 io.to(user.enemy).emit("RSPENEMYDONE");
                 if(rooms[ridx].rspDone==2){
@@ -314,6 +320,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             }
         });
         socket.on('PLACE',function(packet){//바둑돌 착수
+            var user = findMyUser(socket);
             user.lastping = moment();
             var ridx = getRoomIndexByRoomName(user.room);
             if(rooms[ridx]==undefined){
@@ -342,6 +349,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             processPlace(io,db,ridx,user,packet.x,packet.y);
         });
         socket.on('GAMECHAT',function(packet){//게임 중 채팅
+            var user = findMyUser(socket);
             user.lastping = moment();
             var message = packet.substring(0,20);
             if(user.userinfo!=null&&user!=null){
@@ -350,9 +358,11 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             }
         });
         socket.on('GAMEQUIT',function(packet){//강제 종료, 페이지 이동 이외의 이유로 사용자 퇴장
+            var user = findMyUser(socket);
             user.lastping = moment();
         });
         socket.on('ROOMSOFTQUIT',function(packet){//사용자 룸 강제 퇴장..
+            var user = findMyUser(socket);
             user.lastping = moment();
 
             var ridx = getRoomIndexByRoomName(user.room);
@@ -360,6 +370,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             closeRoom(io,db,ridx,"SOFTQUIT",user.userinfo.id);
         });
         socket.on('CONNECT',function(packet){//친구에게 강제 연결..
+            var user = findMyUser(socket);
             var me = packet.me;
             var enemy_name = packet.to;
             try{
@@ -394,6 +405,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             }
         });
         socket.on('CONNECTACCEPT',function(packet){//친구에게 연결 수락..
+            var user = findMyUser(socket);
             var enemyIndex = getUserIndexbyId(packet);
             if(users[enemyIndex]!=null){
                 console.log(users[enemyIndex].userinfo.name+"님에게 승낙 소식 알림!");
@@ -404,6 +416,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             }
         });
         socket.on('CONNECTREJECT',function(packet){//친구에게 연결 거부..
+            var user = findMyUser(socket);
             
             var enemyIndex = getUserIndexbyId(packet);
             console.log("CONNECTREJECT : "+packet+"/"+enemyIndex);
@@ -764,7 +777,8 @@ function closeRoom(io,db,ridx,reason='ENDGAME',who){
 
                 rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
                 rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
-                rooms[ridx] = null;
+                delete rooms[ridx];
+                console.log("방이 지워 졌나?"+rooms[ridx]);
             }catch(e){
                 console.error(e);
             }
@@ -782,7 +796,8 @@ function closeRoom(io,db,ridx,reason='ENDGAME',who){
             io.to(rooms[ridx].roomID).emit("ROOMCLOSED",reason);
             if(rooms[ridx]&&rooms[ridx].players[0]) rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
             if(rooms[ridx]&&rooms[ridx].players[1]) rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
-            rooms[ridx] = null;
+            delete rooms[ridx];
+            console.log("방이 지워 졌나?"+rooms[ridx]);
         });
         
     }else{
@@ -790,7 +805,8 @@ function closeRoom(io,db,ridx,reason='ENDGAME',who){
             io.to(rooms[ridx].roomID).emit("ROOMCLOSED",reason);
             if(rooms[ridx]&&rooms[ridx].players[0]) rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
             if(rooms[ridx]&&rooms[ridx].players[1]) rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
-            rooms[ridx] = null;
+            delete rooms[ridx];
+            console.log("방이 지워 졌나?"+rooms[ridx]);
         }catch(err){
             console.log(err);
         }
@@ -855,4 +871,17 @@ function gold(act){
             return GOLD_PANALTY*MULTIPLY;
         break;
     }
+}
+
+function findMyUser(socket){
+    for(var i = 0;i<users.length;i++){
+        if(users[i].socket==socket) return users[i];
+    }
+    return -1;
+}
+function findMyUserPointer(socket){
+    for(var i = 0;i<users.length;i++){
+        if(users[i].socket==socket) return i;
+    }
+    return -1;
 }
