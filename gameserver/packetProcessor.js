@@ -226,13 +226,13 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             if(rooms[ridx]){
                 rooms[ridx].rspDone++;
                 //TODO : 여기 고쳐!
-                try{
-                    rooms[ridx].players[playerIndex].rsp = packet;
-                    console.log("[룸서버@"+user.room+"]"+user.userinfo.name+"님이 "+packet+"선택");
-                }catch(e){
-                    console.log("아직 룸에 유저 덜넣음..");
+                if(rooms[ridx]==undefined){
+                    console.error("아직 Room이 준비되지 않았습니다.");
                     closeRoom(io,db,ridx,"DISCONNECTUNKNOWN");
+                    return;
                 }
+                rooms[ridx].players[playerIndex].rsp = packet;
+                console.log("[룸서버@"+user.room+"]"+user.userinfo.name+"님이 "+packet+"선택");
                 io.to(user.enemy).emit("RSPENEMYDONE");
                 if(rooms[ridx].rspDone==2){
                     var rspResult1 = rooms[ridx].players[0].rsp;
@@ -519,7 +519,7 @@ function makeRoom(userObj1,userObj2){
 
     userObj1.socket.emit("MATCHED",userObj2.userinfo);
     userObj2.socket.emit("MATCHED",userObj1.userinfo);
-    var room = userObj1.userinfo.id+"VS"+userObj2.userinfo.id+(moment().toString());
+    var room = userObj1.userinfo.id+"VS"+userObj2.userinfo.id+(moment().format("YMDHms"));
 
     userObj1.room = room;
     userObj2.room = room;
@@ -527,7 +527,7 @@ function makeRoom(userObj1,userObj2){
     userObj1.socket.join(room);
     userObj2.socket.join(room);
 
-    console.log("[MAKEROOM] "+userObj1.userinfo.name+" VS "+userObj2.userinfo.name+" : 매치 시작!");
+    console.log("[MAKEROOM] ["+rooms.length+"]"+userObj1.userinfo.name+" VS "+userObj2.userinfo.name+" : 매치 시작!");
 }
 
 function getUserIndexbyId(id){
@@ -549,7 +549,8 @@ function getUserIndexBySocket(socket){
 
 function getRoomIndexByRoomName(roomid){
     for(var i=0;i<rooms.length;i++){
-        if(rooms[i]!=null&&(rooms[i].roomID = roomid)){
+        console.log("["+i+"]"+rooms[i].roomID+"==?["+i+"]"+roomid);
+        if(rooms[i]!=null&&(rooms[i].roomID == roomid)){
             return i;
         }
     }
