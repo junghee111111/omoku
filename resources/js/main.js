@@ -537,6 +537,7 @@ function allocatePacketProcessor(){
         $("*[omoku-data='enemy-wins']").html(enemy.wins);
         $("*[omoku-data='enemy-loses']").html(enemy.loses);
         $("*[omoku-data='enemy-winRate']").html(calcWinRate(enemy.wins,enemy.loses));
+        $(".board>button").removeClass("on");//바둑판 청소..
         setTimeout(function(){
             showToast(enemy.name+"님과 게임을 시작합니다.","fa-check",false);
         },1000);
@@ -752,7 +753,8 @@ function allocatePacketProcessor(){
         console.log("PLACE .. 누가 ? "+packet.who+" X : "+packet.x+" /  Y : "+packet.y+" 돌 : "+packet.stone);
         clearInterval(globalTurnTimer);
         var c = "pos"+packet.x+"-"+packet.y;
-        $(".board>button."+c).removeClass("on");
+        $(".board>button").removeClass("on");
+        $(".board>button."+c).addClass("on");
         $(".board>button."+c).addClass(packet.stone);
         if(packet.who==auth.User.id){
             //내가 놓는것인가?
