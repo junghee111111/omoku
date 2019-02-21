@@ -296,6 +296,7 @@ section.gameBoard{
     width:100%;
     position:absolute;
     top:120px;
+    z-index:3;
     left:0;
 }
 
@@ -308,6 +309,7 @@ section.gameBoard>.board{
     margin :0 auto;
     position:relative;
     box-shadow:0px 8px 35px rgba(0,0,0,.5);
+    z-index:3;
     button{
         position:absolute;
         width:24px;
@@ -903,6 +905,7 @@ section.lobby{
 
 section.ingame{
     aside.gameAction{
+        z-index:2;
         position: fixed;
         bottom: 78px;
         display:block;

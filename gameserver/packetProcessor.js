@@ -186,27 +186,33 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                 roomIndex = getRoomIndexByRoomName(user.room);
             }
             setTimeout(function(){
-                //5초가 지나도록 에네미 정보가 없다면..
+                //2초가 지나도록 에네미 정보가 없다면..
                 if(!rooms[roomIndex].players[1]||!rooms[roomIndex].players[0]){
                     closeRoom(io,db,roomIndex,"DISCONNECTUNKNOWN");
+                    console.error("1.5초가 지나도록 에네미 정보 없어서 파기");
                 }
-            },5000)
+            },1500)
             setTimeout(()=>{
-                if(rooms[roomIndex].players.length==2&&rooms[roomIndex].status==2){
-                    //두명 다 들어왔다면..
-                    rooms[roomIndex].status = 3;
-                    console.log("[룸서버@"+user.room+"] Room Object에 두명 모두 저장 완료. 가위바위보 시작합니다.");
-                    console.log("ㄴ 플레이어 0 : "+rooms[roomIndex].players[0].userinfo.name+"("+rooms[roomIndex].players[0].userinfo.id+")");
-                    console.log("ㄴ 플레이어 1 : "+rooms[roomIndex].players[1].userinfo.name+"("+rooms[roomIndex].players[1].userinfo.id+")");
-                    io.to(user.room).emit("RSPSTART");
+                if(rooms[roomIndex]==undefined){
+                    //3초가 지나도록 룸 정보 없으면..
+                    closeRoom(io,db,roomIndex,"DISCONNECTUNKNOWN");
+                    console.error("2초가 지나도록 룸 정보 없어서 파기");
+                }else{
+                    if(rooms[roomIndex].players.length==2&&rooms[roomIndex].status==2){
+                        //두명 다 들어왔다면..
+                        rooms[roomIndex].status = 3;
+                        console.log("[룸서버@"+user.room+"] Room Object에 두명 모두 저장 완료. 가위바위보 시작합니다.");
+                        console.log("ㄴ 플레이어 0 : "+rooms[roomIndex].players[0].userinfo.name+"("+rooms[roomIndex].players[0].userinfo.id+")");
+                        console.log("ㄴ 플레이어 1 : "+rooms[roomIndex].players[1].userinfo.name+"("+rooms[roomIndex].players[1].userinfo.id+")");
+                        io.to(user.room).emit("RSPSTART");
+                    }
                 }
-            },1000);
+            },2000);
             
         });
 
         socket.on('RSPSELECT',function(packet){//가위바위보 선택
             user.lastping = moment();
-            console.log("[룸서버@"+user.room+"]"+user.userinfo.name+"님이 "+packet+"선택");
             var ridx = getRoomIndexByRoomName(user.room);
             var playerIndex = getPlayerInRoomById(ridx,user.userinfo.id);
             if(rooms[ridx]){
@@ -214,6 +220,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                 //TODO : 여기 고쳐!
                 try{
                     rooms[ridx].players[playerIndex].rsp = packet;
+                    console.log("[룸서버@"+user.room+"]"+user.userinfo.name+"님이 "+packet+"선택");
                 }catch(e){
                     console.log("아직 룸에 유저 덜넣음..");
                     setTimeout(function(){
@@ -258,37 +265,42 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                         console.log("[룸서버@"+user.room+"] 가위바위보 ("+rooms[ridx].players[winner].userinfo.name+")님이 이김");
                         io.to(user.room).emit("RSPRESULT",rooms[ridx].players[winner].userinfo.id);
                         setTimeout(function(){
-                            rooms[ridx].round = 1;
-                            rooms[ridx].black = rooms[ridx].players[winner].userinfo.id;
-                            rooms[ridx].current = winner;
-                            rooms[ridx].timer = 0;
-                            rooms[ridx].lastTurnPlayer = rooms[ridx].players[winner].userinfo.id;
-                            rooms[ridx].turnTimer = rooms[ridx].timePerTurn;
-                            rooms[ridx].turnLeftTime = rooms[ridx].timePerTurn;
-                            rooms[ridx].timeManager = setInterval(function(){
-                                if(rooms[ridx]!=null){
-                                    rooms[ridx].timer++;
-                                }
-                            },1000);
-
-                            rooms[ridx].turnTimer = setInterval(function(){
-                                if(rooms[ridx].turnLeftTime>0){
-                                    rooms[ridx].turnLeftTime--;
-                                }
+                            if(rooms[ridx]){
+                                rooms[ridx].round = 1;
+                                rooms[ridx].black = rooms[ridx].players[winner].userinfo.id;
+                                rooms[ridx].current = winner;
+                                rooms[ridx].timer = 0;
+                                rooms[ridx].lastTurnPlayer = rooms[ridx].players[winner].userinfo.id;
+                                rooms[ridx].turnTimer = rooms[ridx].timePerTurn;
+                                rooms[ridx].turnLeftTime = rooms[ridx].timePerTurn;
                                 
-                                if(rooms[ridx].turnLeftTime==0){
-                                    var blankPoint = getBlankMapPoint(ridx);
-                                    var pos = blankPoint.split(",");
-                                    processPlace(io,db,ridx,user,Number(pos[0]),Number(pos[1]));
-                                }
-                            },1000);
+                                rooms[ridx].timeManager = setInterval(function(){
+                                    if(rooms[ridx]!=null){
+                                        rooms[ridx].timer++;
+                                    }
+                                },1000);
 
-                            io.to(user.room).emit("GAMETURN",{
-                                who:rooms[ridx].players[winner].userinfo.id,
-                                round:rooms[ridx].round,
-                                timer:rooms[ridx].timer,
-                                timePerTurn:rooms[ridx].timePerTurn
-                            });
+                                rooms[ridx].turnTimer = setInterval(function(){
+                                    if(rooms[ridx].turnLeftTime>0){
+                                        rooms[ridx].turnLeftTime--;
+                                    }
+                                    
+                                    if(rooms[ridx].turnLeftTime==0){
+                                        var blankPoint = getBlankMapPoint(ridx);
+                                        var pos = blankPoint.split(",");
+                                        processPlace(io,db,ridx,user,Number(pos[0]),Number(pos[1]));
+                                    }
+                                },1000);
+
+                                io.to(user.room).emit("GAMETURN",{
+                                    who:rooms[ridx].players[winner].userinfo.id,
+                                    round:rooms[ridx].round,
+                                    timer:rooms[ridx].timer,
+                                    timePerTurn:rooms[ridx].timePerTurn
+                                });
+                            }else{
+                                console.error("그 사이에 없어진 방..");
+                            }
                         },3000);
                     }else{
                         console.log("[룸서버@"+user.room+"] 가위바위보 비김. 재시작..");
@@ -304,6 +316,11 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
         socket.on('PLACE',function(packet){//바둑돌 착수
             user.lastping = moment();
             var ridx = getRoomIndexByRoomName(user.room);
+            if(rooms[ridx]==undefined){
+                console.error("PLACE@룸 정보가 없음!");
+                return;
+            }
+
             if(rooms[ridx].map[Number(packet.x)][Number(packet.y)]!="blank"){
                 return;
             }
@@ -340,7 +357,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
 
             var ridx = getRoomIndexByRoomName(user.room);
             var playerIndex = getPlayerInRoomById(ridx,user.userinfo.id);
-            closeRoom(io,db,ridx,"SOFTQUIT",playerIndex);
+            closeRoom(io,db,ridx,"SOFTQUIT",user.userinfo.id);
         });
         socket.on('CONNECT',function(packet){//친구에게 강제 연결..
             var me = packet.me;
@@ -730,15 +747,20 @@ function closeRoom(io,db,ridx,reason='ENDGAME',who){
     if(reason=="SOFTQUIT"){
         //범인 -200골드 & 전적 제거..
         var QUERY_PUNISH = db.query("UPDATE users SET `gold` = `gold`-"+gold("PANALTY")+", `loses` = `loses`+1 WHERE id = ?",
-        [rooms[ridx].players[who].userinfo.id],
+        [who],
         function(error,results,fields){
             if(error){
                 disconnectPlayer(socket,"0x04/1","데이터베이스 에러",user);
                 return;
             }
-            console.log(ridx+":"+reason+":"+who);
-            io.to(rooms[ridx].players[who].socket.id).emit("ROOMCLOSED",'DISCONNECTBYME');
-            io.to(rooms[ridx].players[theOp(who)].socket.id).emit("ROOMCLOSED",'DISCONNECT');
+            //console.log(ridx+":"+reason+":"+who);
+            var criminal = 1;
+            if(rooms[ridx].players[0].userinfo.id-=who){
+                criminal = 0;
+            }
+            io.to(rooms[ridx].players[criminal].socket.id).emit("ROOMCLOSED",'DISCONNECTBYME');
+            io.to(rooms[ridx].players[theOp(criminal)].socket.id).emit("ROOMCLOSED",'DISCONNECT');
+
             rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
             rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
             rooms[ridx] = null;
@@ -753,16 +775,17 @@ function closeRoom(io,db,ridx,reason='ENDGAME',who){
                 disconnectPlayer(socket,"0x04/1","데이터베이스 에러",user);
                 return;
             }
-            rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
-            rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
+            io.to(rooms[ridx].roomID).emit("ROOMCLOSED",reason);
+            if(rooms[ridx]&&rooms[ridx].players[0]) rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
+            if(rooms[ridx]&&rooms[ridx].players[1]) rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
             rooms[ridx] = null;
         });
-        io.to(rooms[ridx].roomID).emit("ROOMCLOSED",reason);
+        
     }else{
         try{
             io.to(rooms[ridx].roomID).emit("ROOMCLOSED",reason);
-            rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
-            rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
+            if(rooms[ridx]&&rooms[ridx].players[0]) rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
+            if(rooms[ridx]&&rooms[ridx].players[1]) rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
             rooms[ridx] = null;
         }catch(err){
             console.log(err);

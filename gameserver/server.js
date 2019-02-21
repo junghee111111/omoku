@@ -1,4 +1,4 @@
-const MATCHINTERVAL = 3000;
+const MATCHINTERVAL = 1000;
 const CLEANERINTERVAL = 1000;
 const PORT = 7376;
 const PRODUCTION = true;

@@ -152,6 +152,8 @@ if(Auth::check()){
                     </h1>
                     <p>
                     화면 오른쪽이 잘리는 분들은 <strong class="colorRed" style="display:inline">두 손가락으로 화면을 끝까지 줌 아웃</strong>한 상태로 이용하세요!
+                    <br />
+                    개발자 이메일 : <a href="mailto://tokki.lab@gmail.com">tokki.lab@gmail.com</a>
                     </p>
                 </div><!--채팅-->
             </section>
