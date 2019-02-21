@@ -506,7 +506,7 @@ function makeRoom(userObj1,userObj2){
 
     userObj1.socket.emit("MATCHED",userObj2.userinfo);
     userObj2.socket.emit("MATCHED",userObj1.userinfo);
-    var room = userObj1.userinfo.id+"VS"+userObj2.userinfo.id;
+    var room = userObj1.userinfo.id+"VS"+userObj2.userinfo.id+(moment().toString());
 
     userObj1.room = room;
     userObj2.room = room;
@@ -754,16 +754,20 @@ function closeRoom(io,db,ridx,reason='ENDGAME',who){
                 return;
             }
             //console.log(ridx+":"+reason+":"+who);
-            var criminal = 1;
-            if(rooms[ridx].players[0].userinfo.id-=who){
-                criminal = 0;
-            }
-            io.to(rooms[ridx].players[criminal].socket.id).emit("ROOMCLOSED",'DISCONNECTBYME');
-            io.to(rooms[ridx].players[theOp(criminal)].socket.id).emit("ROOMCLOSED",'DISCONNECT');
+            try{
+                var criminal = 1;
+                if(rooms[ridx].players[0].userinfo.id-=who){
+                    criminal = 0;
+                }
+                io.to(rooms[ridx].players[criminal].socket.id).emit("ROOMCLOSED",'DISCONNECTBYME');
+                io.to(rooms[ridx].players[theOp(criminal)].socket.id).emit("ROOMCLOSED",'DISCONNECT');
 
-            rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
-            rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
-            rooms[ridx] = null;
+                rooms[ridx].players[0].socket.leave(rooms[ridx].roomID);
+                rooms[ridx].players[1].socket.leave(rooms[ridx].roomID);
+                rooms[ridx] = null;
+            }catch(e){
+                console.error(e);
+            }
         });
         
     }else if(reason=="DISCONNECT"){
