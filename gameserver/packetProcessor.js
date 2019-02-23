@@ -563,8 +563,10 @@ function getUserIndexBySocket(socket){
 function getRoomIndexByRoomName(roomid){
     for(var i=0;i<rooms.length;i++){
         //console.log("["+i+"]"+rooms[i].roomID+"==?["+i+"]"+roomid);
-        if(rooms[i]!=null&&(rooms[i].roomID == roomid)){
-            return i;
+        if(rooms[i]!=undefined){
+            if((rooms[i].roomID == roomid)){
+                return i;
+            }
         }
     }
     return -1;

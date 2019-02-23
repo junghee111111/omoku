@@ -720,7 +720,7 @@ function allocatePacketProcessor(){
                 if(globalTurnTimeLeft==5&&placable){
                     myTurnNotify("5초 남았습니다.",true);
                 }
-                $("*[omoku-data='turn-time-left']").html(" "+globalTurnTimeLeft+"초 남음 / 화면 아래가 잘리면 스크롤을 내리세요.");
+                $("*[omoku-data='turn-time-left']").html(" "+globalTurnTimeLeft+"초 남음");
             }else{
                 $("*[omoku-data='turn-time-left']").html(" 아무곳이나 착수합니다.");
             }
