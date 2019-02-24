@@ -194,9 +194,14 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             }
             setTimeout(function(){
                 //2초가 지나도록 에네미 정보가 없다면..
-                if(!rooms[roomIndex].players[1]||!rooms[roomIndex].players[0]){
+                try{
+                    if(!rooms[roomIndex].players[1]||!rooms[roomIndex].players[0]){
+                        closeRoom(io,db,roomIndex,"DISCONNECTUNKNOWN");
+                        console.error("1.5초가 지나도록 에네미 정보 없어서 파기!");
+                    }
+                }catch(e){
                     closeRoom(io,db,roomIndex,"DISCONNECTUNKNOWN");
-                    console.error("1.5초가 지나도록 에네미 정보 없어서 파기");
+                    console.error("1.5초가 룸 정보가 없어서 파기..");
                 }
             },1500)
             setTimeout(()=>{
@@ -207,23 +212,10 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                 }else{
                     if(rooms[roomIndex].players.length==2&&rooms[roomIndex].status==2){
                         //두명 다 들어왔다면..
-                        if(rooms[roomIndex].players[0].userinfo.id==0||rooms[roomIndex].players[1].userinfo.id==0){
-                            console.error("룸을 만드는데, 둘중에 한명이 정보가 부족합니다..");
-                            //둘중에 한명 정보 부족!
-                            if(rooms[roomIndex].players[0].userinfo.id==0){
-                                disconnectPlayer(rooms[roomIndex].players[0].socket,"0x06/1","플레이어 정보 오류. 새로고침 해주세요.",rooms[roomIndex].players[0]);
-                            }
-                            if(rooms[roomIndex].players[1].userinfo.id==0){
-                                disconnectPlayer(rooms[roomIndex].players[1].socket,"0x06/1","플레이어 정보 오류. 새로고침 해주세요.",rooms[roomIndex].players[1]);
-                            }
-                            closeRoom(io,db,roomIndex,"DISCONNECTUNKNOWN");
-                            return;
-                        }else{
-                            rooms[roomIndex].status = 3;
-                            console.log("[룸서버@"+user.room+"] Room Object에 두명 모두 저장 완료. 가위바위보 시작합니다.");
-                            console.log("ㄴ 플레이어 0 : "+rooms[roomIndex].players[0].userinfo.name+"("+rooms[roomIndex].players[0].userinfo.id+")");
-                            console.log("ㄴ 플레이어 1 : "+rooms[roomIndex].players[1].userinfo.name+"("+rooms[roomIndex].players[1].userinfo.id+")");
-                        }
+                        rooms[roomIndex].status = 3;
+                        console.log("[룸서버@"+user.room+"] Room Object에 두명 모두 저장 완료. 가위바위보 시작합니다.");
+                        console.log("ㄴ 플레이어 0 : "+rooms[roomIndex].players[0].userinfo.name+"("+rooms[roomIndex].players[0].userinfo.id+")");
+                        console.log("ㄴ 플레이어 1 : "+rooms[roomIndex].players[1].userinfo.name+"("+rooms[roomIndex].players[1].userinfo.id+")");
                         io.to(user.room).emit("RSPSTART");
                     }
                 }
