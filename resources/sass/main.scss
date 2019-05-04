@@ -8,6 +8,10 @@ $transBlackOver:rgba(0,0,0,.7);
 section.login,section.lobby,section.ingame{
     display:none;
 }
+.flex{
+    display:flex;
+    justify-content: space-between;
+}
 .bg{
     background: #ad5389;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #3c1053, #ad5389);  /* Chrome 10-25, Safari 5.1-6 */
@@ -39,7 +43,7 @@ section.login,section.lobby,section.ingame{
 .logoWrapper{
     margin:50px;
     text-align:center;
-    height:80px;
+    min-height:80px;
     z-index:1;
 }
 .logoWrapper>img{
@@ -48,7 +52,8 @@ section.login,section.lobby,section.ingame{
 .logoWrapper>#welcomeMessage>div.welcomeMessage{
     font-size:13px;
     padding:10px;
-    margin:15px 0px;
+    margin:15px 15px;
+    text-align:Center;
     background-color:white;
     border:3px solid rgba(0,0,0,.1);
     border-radius:4px;
@@ -58,17 +63,21 @@ section.login,section.lobby,section.ingame{
     color:red;
 }
 .titlecard{
-    position:absolute;
-    margin:0 5%;
-    width:90%;
-    top:260px;
-    left:0;
-    padding:20px;
+    margin:10px;
+    width:auto;
+    position:relative;
+    padding:15px;
     box-sizing: border-box;
     background-color:white;
     border:none;
+    h1{
+        font-size:14px;
+        margin-bottom:5px;
+        font-weight:bold;
+        text-align:left;
+    }
 }
-.titlecard>form>button{
+.titlecard>form button{
     color:white;
     font-size:14px;
     padding:10px 15px;
@@ -79,30 +88,20 @@ section.login,section.lobby,section.ingame{
     background: -webkit-linear-gradient(to right, #f7b733, #fc4a1a);  /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to right, #f7b733, #fc4a1a); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
-.titlecard>form>button.green{
+.titlecard>form button.green{
     background: #B3FFAB;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #07ea78, #18d9d1);  /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to right, #07ea78, #18d9d1); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
-.titlecard>form>button.blue{
+.titlecard>form button.blue{
     background: #00c6ff;  /* fallback for old browsers */
     background: -webkit-linear-gradient(to left, #0072ff, #00c6ff);  /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to left, #0072ff, #00c6ff); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
-.titlecard>form>button:disabled{
+.titlecard>form button:disabled{
     background-image: unset;
     background-color:gray;
     color:#CCC;
-}
-.titlecard>form>button.login{
-    position:absolute;
-    bottom:-20px;
-    right:10px;
-}
-.titlecard>form>button.signup{
-    position:absolute;
-    bottom:-20px;
-    left:10px;
 }
 .titlecard>form>label{
     display:block;
@@ -448,17 +447,19 @@ section.gameBoard>.statusBar>span.right{
     @include setAnim(spin 0.75s infinite ease-in-out);
 }
 div.card{
-    background-color:$transBlack;
-    border-radius:4px;
-    padding:10px;
+    background-color: white;
+    padding:15px;
     margin:0 10px;
     margin-bottom:10px;
-    color:#fff;
+    border-radius:0;
+    border:none;
+    color:#000;
     font-size:12px;
     h1{
         font-size:14px;
-        color:white;
+        text-align:left;
         margin:0;
+        margin-bottom:5px;
         padding:0;
         font-weight:bold;
     }
@@ -477,16 +478,17 @@ div.card{
         background-color:transparent;
         font-size:12px;
         line-height:150%;
-        color:#fff;
+        color:black;
         border:none;
-        height:120px;
+        height:100px;
         padding:5px 0;
     }
     input#chatInput{
-        background-color:rgba(0,0,0,.5);
+        background-color:rgba(0,0,0,.1);
         font-size:12px;
+        border-radius:3px;
         line-height:150%;
-        color:#fff;
+        color:black;
         border:none;
         outline:none;
         padding:5px;
@@ -502,7 +504,7 @@ section.lobby{
                 ul{
                     padding:0;
                     font-size:14px;
-                    color:#fff;
+                    color:black;
                     list-style:none;
                     
                     margin:0;
@@ -524,10 +526,10 @@ section.lobby{
                 button{
                     display:block;
                     width:100%;
-                    color:white;
+                    color:black;
                     padding:5px;
                     border:none;
-                    background-color: rgba(255,255,255,.5);
+                    background-color: rgba(0,0,0,.1);
                     border-radius: 4px;
                     margin-top: 8px;
                 }
@@ -571,7 +573,7 @@ section.lobby{
                     margin:10px 0;
                     list-style:none;
                     padding:0;
-                    background-color:rgba(255,255,255,.3);
+                    background-color:#EFEFEF;
                     border-radius:4px;
                     box-sizing: border-box;
                     li{
@@ -597,11 +599,11 @@ section.lobby{
                         height:90px;
                         margin-top:10px;
                         padding:10px 0;
-                        background-color:rgba(255,255,255,.3);
+                        background-color:#EFEFEF;
                         border-radius:4px;
                         display:none;
                         .imageHolder{
-                            background-color:rgba(255,255,255,.3);
+                            background-color:#FFF;
                             border-radius:4px;
                             width:50px;
                             height:50px;
@@ -611,7 +613,7 @@ section.lobby{
                             text-align:center;
                         }
                         h1{
-                            color:#fff;
+                            color:black;
                             margin:0;
                             margin-bottom:5px;
                             margin-left:65px;
@@ -622,18 +624,18 @@ section.lobby{
                             margin:0;
                             padding:0;
                             margin-left:65px;
-                            color:#fff;
+                            color:black;
                             font-size:13px;
                         }
                         button{
                             position: absolute;
                             bottom: 5px;
-                            background-color: rgba(0,0,0,.3);
+                            background-color: #fff;
                             right: 5px;
                             border: none;
                             border-radius: 4px;
-                            padding: 3px 5px;
-                            color: white;
+                            padding: 5px 10px;
+                            color: black;
                         }
                     }
                 }
@@ -724,7 +726,7 @@ section.lobby{
     
     .logoWrapper{
         margin:0;
-        height:80px;
+        min-height:80px;
         text-align:left;
         padding:0;
         .myinfo{

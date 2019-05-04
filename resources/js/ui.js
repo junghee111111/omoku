@@ -83,19 +83,19 @@ $("section.gameBoard").click(function(){
     }
 });
 
-$("#loginform>button.signup").click(function(){
+$("#loginform button.signup").click(function(){
     $("#loginform").hide();
     $("#registerform").fadeIn();
-    $("#loginformWrapper").animate({
+    /*$("#loginformWrapper").animate({
         'top':"225px"
-    },500);
+    },500);*/
 })
-$("#registerform>button.signup.back").click(function(){
+$("#registerform button.signup.back").click(function(){
     $("#registerform").hide();
     $("#loginform").fadeIn();
-    $("#loginformWrapper").animate({
+    /*$("#loginformWrapper").animate({
         'top':"260px"
-    },500);
+    },500);*/
 })
 /*
 window.onbeforeunload = function (e) {

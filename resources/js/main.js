@@ -1,4 +1,4 @@
-const PRODUCTION = true;
+const PRODUCTION = false;
 var gSTATUS;
 var socket;
 var UI_loginForm,UI_LoginSubmitBtnNormalDOM,UI_LoginSubmitBtn;
@@ -291,8 +291,8 @@ jQuery(document).ready(function(){
             if(data.loggedIn){
                 procAfterLoginChecked(data);
             }else{
-                $("section.login").fadeIn();
-                hideToast();
+                //$("section.login").fadeIn();
+                procAfterLoginChecked(data);
                 doOnOrientationChange();
             }
             refreshPingData(data);
@@ -434,7 +434,9 @@ function procAfterLoginChecked(data){
         showToast("게임 서버에 연결할 수 없습니다.<br/>서버 점검중일 수 있습니다.","fa-ban",false,true);
     }
     auth = data;
-    $("*[omoku-data='name']").html(auth.User.name);
+    if(auth.loggedIn==true){
+        $("*[omoku-data='name']").html(auth.User.name);
+    }
     allocatePacketProcessor();
 }
 
@@ -457,6 +459,7 @@ function allocatePacketProcessor(){
     socket.on('HANDSHAKEREQ',function(packet){
         //HANDSHAKE PACKET
         console.log("SERVER REQUEST HANDSHAKE..");
+        showToast("게임 서버 인증 정보 요구..");
         socket.emit('HANDSHAKEADDITIONAL',auth.User);
     });
 

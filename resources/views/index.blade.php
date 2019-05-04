@@ -9,7 +9,7 @@
     <div class="small"></div>
 </div>
 <!--로비-->
-<section class="login">
+<!--<section class="login" style="display:none">
     <div class="logoWrapper">
         <img src="/img/logo.png">
         <div id="welcomeMessage">
@@ -20,78 +20,16 @@
             </div>
         </div>
     </div>
-    <!--메인메뉴-->
-    <div class="titlecard" id="loginformWrapper">
-        <form method="POST" id="loginform" action="{{route('login')}}">
-        {!! csrf_field() !!}
-            <label>
-                닉네임
-                <br/>
-                <input type="text" name="name" value="{{old('name')}}" maxlength="6" required/>
-                <em class="fa fa-user-circle"></em>
-            </label>
-            <label>
-                비밀번호
-                <br/>
-                <input type="password" name="password" id="password" required/>
-                <em class="fa fa-key"></em>
-            </label>
-            <label>
-                <input type="checkbox" checked name="remember"> 자동 로그인
-            </label>
-            <button type="submit" class="login blue"><em class="fa fa-sign-in-alt"></em> 닉네임으로 로그인</button>
-            <button class="signup" onclick="return false;"><em class="fa fa-user-plus"></em> 회원가입</button>
-            
-        </form>
-        <form method="POST" id="registerform" action="{{route('register')}}" style="display:none;">
-        {!! csrf_field() !!}
-            <label>
-                닉네임(6자 이하)
-                <br/>
-                <input type="text" name="name" value="{{old('name')}}" maxlength="6" required/>
-                <em class="fas fa-id-card"></em>
-            </label>
-            <!--<label>
-                이메일
-                <br/>
-                <input type="email" name="email" value="{{old('email')}}" required/>
-                <em class="fa fa-at"></em>
-            </label>-->
-            <label>
-                비밀번호(8자 이상)
-                <br/>
-                <input type="password" name="password" required/>
-                <em class="fa fa-key"></em>
-            </label>
-            <label>
-                비밀번호 확인
-                <br/>
-                <input type="password" name="password_confirmation" id="password_confirmation" required/>
-                <em class="fa fa-check"></em>
-            </label>
-            
-            <label style="text-align:right;">
-                감사합니다!
-            </label>
-            <label style="display:none;">
-                <input type="checkbox" required name="laws" id="laws" checked> <a id='go_laws' href="#">이용 약관</a>을 이해했으며 동의합니다.
-            </label>
-            <label style="display:none;">
-                <input type="checkbox" required name="privacy" id="privacy" checked> <a id='go_privacy' href="#">개인정보 취급방침</a>을 이해했으며 동의합니다.
-            </label>
-            <button type="submit" class="login green"><em class="fa fa-user-check"></em> 회원가입 요청</button>
-            <button class="signup back" onclick="return false;"><em class="fa fa-arrow-left"></em> 로그인하기..</button>
-            
-        </form>
-    </div>
+    
 </section>
 <!--인게임-->
-<?php
-if(Auth::check()){
-    ?>
-    <section class="lobby">
-        <div class="logoWrapper">
-            <img src="/img/logo.png">
+
+<section class="lobby" style="display:block;">
+    <div class="logoWrapper">
+        <img src="/img/logo.png">
+        <?php
+        if(Auth::check()){
+            ?>
             <div class="myinfo">
                 <em class="fa fa-user"></em>
                 <span class="username" omoku-data="name">-</span>
@@ -105,9 +43,26 @@ if(Auth::check()){
                     </li>
                 </ul>
             </div>
-        </div>
-        <div class="body">
-            <section class="home segment">
+            <?php
+        }else{
+            /*?>
+            <div id="welcomeMessage">
+                <div class="welcomeMessage">
+                    설치가 필요 없는 온라인 오목 게임
+                    <br/>
+                    <strong>10초만에 가입 후 바로 시작해 보세요!</strong>
+                </div>
+            </div>
+            <?php*/
+        }
+        ?>
+        
+    </div>
+    <div class="body">
+        <section class="home segment">
+            <?php
+            if(Auth::check()){
+                ?>
                 <div class="card">
                     <h1>
                         <span omoku-data="name"></span>
@@ -126,25 +81,20 @@ if(Auth::check()){
                         (승률 <span omoku-data="winRate"><?=$ratio;?></span>%)
                     </h2>
                 </div><!--프로필-->
-                <div class="card">
-                    <h1>
-                    <span class="fa fa-bullhorn"></span>&nbsp;
-                        공지사항
-                    </h1>
-                    <h2>오모쿠 오픈베타를 시작합니다.</h2>
-                    <p>
-                        현재 오픈 베타 중이며 서버가 불안정할 수 있습니다.
-                        <br/>감사합니다.
-                    </p>
-                </div><!--공지사항-->
-                <div class="card">
-                    <h1>
-                        <span class="fa fa-comments"></span>&nbsp;
-                        로비 채팅 - <span omoku-data="counter"></span> 명 접속중
-                    </h1>
-                    <textarea readonly id="chatContents">게임 서버에 연결하는 중..</textarea>
-                    <input maxlength="40" type="text" placeholder="여기에 채팅 입력 후 엔터키로 전송" id="chatInput"/>
-                </div><!--채팅-->
+                <?php
+            }
+            ?>
+            <div class="card">
+                <h1>
+                    <span class="fa fa-comments"></span>&nbsp;
+                    로비 채팅 - <span omoku-data="counter"></span> 명 접속중
+                </h1>
+                <textarea readonly id="chatContents">게임 서버에 연결하는 중..</textarea>
+                <input maxlength="40" type="text" placeholder="여기에 채팅 입력 후 엔터키로 전송" id="chatInput"/>
+            </div><!--채팅-->
+            <?php
+            if(Auth::check()){
+                ?>
                 <div class="card">
                     <h1>
                         <span class="fas fa-exclamation-circle"></span>&nbsp;
@@ -159,49 +109,135 @@ if(Auth::check()){
                     <br />
                     개발자 이메일 : <a href="mailto://tokki.lab@gmail.com">tokki.lab@gmail.com</a>
                     </p>
-                </div><!--채팅-->
-            </section>
-            <section class="ranking segment">
-                <div class="card white">
+                </div><!--팁-->
+                <?php
+            }else{
+                ?>
+                <div class="titlecard" id="loginformWrapper">
                     <h1>
-                        랭킹
-                    </h1>
-                    <div class="rankBoard">
-                        로드중..
-                    </div>
+                    <span class="fa fa-sign-in-alt"></span>&nbsp;
+                    오모쿠 접속</h1>
+                    <form method="POST" id="loginform" action="{{route('login')}}">
+                    {!! csrf_field() !!}
+                        <label>
+                            <input placeholder="닉네임" type="text" name="name" value="{{old('name')}}" maxlength="6" required/>
+                            <em class="fa fa-user-circle"></em>
+                        </label>
+                        <label>
+                            <input placeholder="비밀번호" type="password" name="password" id="password" required/>
+                            <em class="fa fa-key"></em>
+                        </label>
+                        <label>
+                            <input type="checkbox" checked name="remember"> 자동 로그인
+                        </label>
+                        <div class="flex">
+                            <button class="signup" onclick="return false;"><em class="fa fa-user-plus"></em> 회원가입</button>
+                            <button type="submit" class="login blue"><em class="fa fa-sign-in-alt"></em> 로그인</button>
+                        </div>
+                        
+                        
+                        
+                    </form>
+                    <form method="POST" id="registerform" action="{{route('register')}}" style="display:none;">
+                    {!! csrf_field() !!}
+                        <label>
+                            닉네임(6자 이하)
+                            <br/>
+                            <input type="text" name="name" value="{{old('name')}}" maxlength="6" required/>
+                            <em class="fas fa-id-card"></em>
+                        </label>
+                        <!--<label>
+                            이메일
+                            <br/>
+                            <input type="email" name="email" value="{{old('email')}}" required/>
+                            <em class="fa fa-at"></em>
+                        </label>-->
+                        <label>
+                            비밀번호(8자 이상)
+                            <br/>
+                            <input type="password" name="password" required/>
+                            <em class="fa fa-key"></em>
+                        </label>
+                        <label>
+                            비밀번호 확인
+                            <br/>
+                            <input type="password" name="password_confirmation" id="password_confirmation" required/>
+                            <em class="fa fa-check"></em>
+                        </label>
+                        
+                        
+                        <label style="display:none;">
+                            <input type="checkbox" required name="laws" id="laws" checked> <a id='go_laws' href="#">이용 약관</a>을 이해했으며 동의합니다.
+                        </label>
+                        <label style="display:none;">
+                            <input type="checkbox" required name="privacy" id="privacy" checked> <a id='go_privacy' href="#">개인정보 취급방침</a>을 이해했으며 동의합니다.
+                        </label>
+                        <div class="flex">
+                        <button class="signup back" onclick="return false;"><em class="fa fa-arrow-left"></em> 로그인하기..</button>
+                        <button type="submit" class="login green"><em class="fa fa-user-check"></em> 회원가입 요청</button>
+                        </div>
+                    </form>
                 </div>
-            </section>
-            <section class="store segment">
-                <div class="card white">
-                    <h1>
-                        상점 <em class="fa fa-dot-circle gold">&nbsp;<span omoku-data='gold'></span></em> 소지
-                    </h1>
-                    <div class="storeBoard">
-                        <ul class="menu">
-                            <li type="dol" class="on">바둑돌</li>
-                            <li type="board">바둑판</li>
-                        </ul>
-                        <ul class="item">
-                            
-                        </ul>
-                    </div>
+                <?php
+            }
+            ?>
+            <div class="card">
+                <h1>
+                <span class="fa fa-bullhorn"></span>&nbsp;
+                    공지사항
+                </h1>
+                <h2>오모쿠 오픈베타를 시작합니다.</h2>
+                <p>
+                    현재 오픈 베타 중이며 서버가 불안정할 수 있습니다.
+                    <br/>감사합니다.
+                </p>
+            </div><!--공지사항-->
+        </section>
+        <section class="ranking segment">
+            <div class="card white">
+                <h1>
+                <span class="fa fa-trophy"></span>&nbsp;
+                    랭킹
+                </h1>
+                <div class="rankBoard">
+                    로드중..
                 </div>
-            </section>
-            <section class="account segment">
-                <div class="card white">
-                    <h1>
-                        인벤토리
-                    </h1>
-                    <div class="inventory">
-                        <ul class="purchaseList">
+            </div>
+        </section>
+        <section class="store segment">
+            <div class="card white">
+                <h1>
+                    상점 <em class="fa fa-dot-circle gold">&nbsp;<span omoku-data='gold'></span></em> 소지
+                </h1>
+                <div class="storeBoard">
+                    <ul class="menu">
+                        <li type="dol" class="on">바둑돌</li>
+                        <li type="board">바둑판</li>
+                    </ul>
+                    <ul class="item">
+                        
+                    </ul>
+                </div>
+            </div>
+        </section>
+        <section class="account segment">
+            <div class="card white">
+                <h1>
+                    인벤토리
+                </h1>
+                <div class="inventory">
+                    <ul class="purchaseList">
 
-                        </ul>
-                    </div>
+                    </ul>
                 </div>
-                <div class="card white">
-                    <h1>
-                        계정
-                    </h1>
+            </div>
+            <div class="card white">
+                <h1>
+                    계정
+                </h1>
+                <?php
+                if(Auth::check()){
+                    ?>
                     <div class="accountBoard">
                         <ul>
                             <li>
@@ -249,12 +285,19 @@ if(Auth::check()){
                         <button id="Btn_removeUser">회원 탈퇴</button>
                         <button id="Btn_logout">로그아웃</button>
                     </div>
-                </div>
+                    <?php
+                }
+                ?>
                 
-            </section>
-            <div class="startBtnWrapper">
+            </div>
+            
+        </section>
+        <div class="startBtnWrapper">
+        <?php
+            if(Auth::check()){
+                ?>
                 <div class="inviteListWrapper">
-                    
+                
                 </div>
                 <button class="startBtn" id="connectFriend">
                 <em class="fa fa-user-friends"></em>&nbsp;
@@ -272,34 +315,42 @@ if(Auth::check()){
                 <em class="fas fa-user-check"></em>&nbsp;
                 대전 상대 결정! 곧 게임을 시작합니다.
                 </button>
-            </div>
+                <?php
+            }else{
+                ?>
+                <button class="runningBtn matched" style="display:block;">
+                <em class="fa fa-sign-in-alt"></em>&nbsp;
+                게임을 시작하려면 로그인 해주세요!
+                </button>
+                <?php
+            }    
+        ?>
             
         </div>
-        <nav class="bottom">
-            <ul>
-                <li class="on" segment="home">
-                    <em class="fa fa-home"></em>
-                    <span>로비</span>
-                </li>
-                <li segment="ranking">
-                    <em class="fa fa-trophy"></em>
-                    <span>랭킹</span>
-                </li>
-                <li segment="store">
-                    <em class="fa fa-shopping-bag"></em>
-                    <span>상점</span>
-                </li>
-                <li segment="account">
-                    <em class="fa fa-user-alt"></em>
-                    <span omoku-data="name"></span>
-                </li>
-            </ul>
-        </nav>
-    </section>
+        
+    </div>
+    <nav class="bottom">
+        <ul>
+            <li class="on" segment="home">
+                <em class="fa fa-home"></em>
+                <span>로비</span>
+            </li>
+            <li segment="ranking">
+                <em class="fa fa-trophy"></em>
+                <span>랭킹</span>
+            </li>
+            <li segment="store">
+                <em class="fa fa-shopping-bag"></em>
+                <span>상점</span>
+            </li>
+            <li segment="account">
+                <em class="fa fa-user-alt"></em>
+                <span omoku-data="name">계정</span>
+            </li>
+        </ul>
+    </nav>
+</section>
 
-<?php
-}
-?>
 
 @include("ingame")
 @stop

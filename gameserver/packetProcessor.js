@@ -42,6 +42,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             "room":null,
             "ready":false,
             "rsp":null,
+            "loggedIn":false,
             "lastping":moment()
         };
         users.push(user);
@@ -56,12 +57,17 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             try{
                 user.lastping = moment();
                 var chat = chat.substring(0,40);
-                if(user.userinfo!=null&&user!=null){
-                    console.log("[채팅] "+user.userinfo.name+" : "+chat);
+                if(user!=null){
+                    var name = "비회원"+socket.id.substr(0,3);
+                    if(user.userinfo!=null){
+                        name = user.userinfo.name;
+                    }
+                    _log("MASTER","CHAT",socket.id+" | "+name+" : "+chat);
                     for(var i = 0;i<users.length;i++){
-                        if(users[i].status==2
+                        if(users[i].status==1||
+                            users[i].status==2
                             ||users[i].status==3){
-                            users[i].socket.emit("CHAT",user.userinfo.name+" : "+chat);
+                            users[i].socket.emit("CHAT",name+" : "+chat);
                         }
                     }
                 }
@@ -74,64 +80,71 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             var user = findMyUser(socket);
             try{
                 user.lastping = moment();
-
+                _log("MASTER","HANDSHAKEADDI",socket.id+" HANDSHAKE ADDI REQ");
                 //db의 검증 필요함..
-
-                var validateUserinfo = db.query("SELECT * FROM `users` WHERE `id` = ? AND `name` = ? AND `email` = ? AND `created_at` = ? AND `updated_at` = ? AND `wins` = ? AND `loses` = ? AND `gold` = ?",
-                [userinfo.id,userinfo.name,userinfo.email,userinfo.created_at,userinfo.updated_at,userinfo.wins,userinfo.loses,userinfo.gold],
-                function(error,results,fields){
-                    if(error){
-                        disconnectPlayer(socket,"0x01/1","데이터베이스 에러",user);
-                        return;
-                    }
-                    if(results[0]==null||userinfo==null){
-                        console.log("신원 확인 불가..");
-                        disconnectPlayer(socket,"0x01/21","잘못된 유저 정보",user);
-                        return;
-                    }
-                    if(results[0].id==userinfo.id){
-                        user.userinfo = userinfo;
-
-                        var userIndex = getUserIndexBySocket(user.socket);
-                        if(userIndex==-1){
-                            disconnectPlayer(socket,"0x01/22","잘못된 유저 정보 ["+user.userinfo.name+"]",user);
+                if(userinfo){
+                    var validateUserinfo = db.query("SELECT * FROM `users` WHERE `id` = ? AND `name` = ? AND `email` = ? AND `created_at` = ? AND `updated_at` = ? AND `wins` = ? AND `loses` = ? AND `gold` = ?",
+                    [userinfo.id,userinfo.name,userinfo.email,userinfo.created_at,userinfo.updated_at,userinfo.wins,userinfo.loses,userinfo.gold],
+                    function(error,results,fields){
+                        if(error){
+                            disconnectPlayer(socket,"0x01/1","데이터베이스 에러",user);
                             return;
                         }
-
-                        users[userIndex] = user;
-                        
-                        
-                        console.log(" ㄴ("+user.userinfo.name+"/"+user.userinfo.id+") 신원 확인 완료.");
-
-                        if(results[0].online==1){
-                            //이미 접속중..
-                            user.userinfo = null;
-                            disconnectPlayer(socket,"0x01/3","이미 접속중인 아이디 입니다. 브라우저의 다른 탭을 확인해 보세요. <a href='/auth/logout'>로그아웃</a>",user);
-                            console.log(results[0].name+" 이미 접속중..");
+                        if(results[0]==null||userinfo==null){
+                            _log("MASTER","HANDSHAKEADDI",socket.id+" 신원확인 불가");
+                            disconnectPlayer(socket,"0x01/21","잘못된 유저 정보",user);
                             return;
                         }
-                        
-                        socket.emit("ACCEPTED",userinfo);
+                        if(results[0].id==userinfo.id){
+                            user.userinfo = userinfo;
 
-                        var validateUserinfo = db.query("UPDATE users SET online = '1' WHERE id = ?",
-                        [userinfo.id],
-                        function(error,results,fields){
-                            if(error){
-                                disconnectPlayer(socket,"0x01/2","데이터베이스 에러",user);
+                            var userIndex = getUserIndexBySocket(user.socket);
+                            if(userIndex==-1){
+                                disconnectPlayer(socket,"0x01/22","잘못된 유저 정보 ["+user.userinfo.name+"]",user);
                                 return;
                             }
-                            user.status = 2;
-                            var welcomeMessage = "[환영] "+moment().format('서버 시각 MMMM Do YYYY, h:mm:ss a');
-                            socket.emit("CHAT",welcomeMessage);//환영 메시지
+                            user.loggedIn = true;
+                            users[userIndex] = user;
                             
-                        });
+                            _log("MASTER","HANDSHAKEADDI",socket.id+" ㄴ("+user.userinfo.name+"/"+user.userinfo.id+") 신원확인  완료");
 
-                    }else{
-                        disconnectPlayer(socket,"0x01/2","잘못된 유저 정보",user);
-                    }
-                });
+                            if(results[0].online==1){
+                                //이미 접속중..
+                                user.userinfo = null;
+                                disconnectPlayer(socket,"0x01/3","이미 접속중인 아이디 입니다. 브라우저의 다른 탭을 확인해 보세요. <a href='/auth/logout'>로그아웃</a>",user);
+                                _log("MASTER","HANDSHAKEADDI 0x01/3",socket.id+" ㄴ("+user.userinfo.name+"/"+user.userinfo.id+") 이미 접속중인 아이디 접근 시도");
+                                return;
+                            }
+                            
+                            socket.emit("ACCEPTED",userinfo);
+
+                            var validateUserinfo = db.query("UPDATE users SET online = '1' WHERE id = ?",
+                            [userinfo.id],
+                            function(error,results,fields){
+                                if(error){
+                                    disconnectPlayer(socket,"0x01/2","데이터베이스 에러",user);
+                                    return;
+                                }
+                                user.status = 2;
+                                var welcomeMessage = "[환영] "+moment().format('서버 시각 MMMM Do YYYY, h:mm:ss a');
+                                socket.emit("CHAT",welcomeMessage);//환영 메시지
+                                _log("MASTER","HANDSHAKEADDI",socket.id+" ("+user.userinfo.name+"/"+user.userinfo.id+") 최종 서버 접근 허가 완료.");
+                            });
+
+                        }else{
+                            disconnectPlayer(socket,"0x01/2","잘못된 유저 정보",user);
+                            _log("MASTER","HANDSHAKEADDI 0x01/2",socket.id+" 잘못된 유저 정보");
+                        }
+                    });
+                }else{
+                    //비회원 접속 시
+                    _log("MASTER","HANDSHAKEADDI",socket.id+" 비회원으로 접속");
+                    socket.emit("ACCEPTED",userinfo);
+                    var welcomeMessage = "[환영] "+moment().format('서버 시각 MMMM Do YYYY, h:mm:ss a');
+                    socket.emit("CHAT",welcomeMessage);//환영 메시지
+                }
             }catch(e){
-                console.log("[HANDSHAKEADDITIONAL] ERROR");
+                _log("MASTER","HANDSHAKEADDI ERR",socket.id+":"+e);
             }
         });
 
@@ -468,11 +481,11 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
         //console.log("[USERSYNC] 게임서버 접속자와 DB를 동기화 합니다..");
         var queryWhere = "";
         for(var i = 0;i<users.length;i++){
-            if(users[i].userinfo){
+            if(users[i].userinfo&&users[i].loggedIn){
                 queryWhere += users[i].userinfo.id+",";
             }
         }
-        if(users.length>0){
+        if(queryWhere!=""){
             queryWhere = queryWhere.substr(0,(queryWhere.length-1));//마지막 쉼표 하나 자름..
             var query1 = "UPDATE users SET `online` = '1' WHERE id IN ("+queryWhere+");";
             var query2 = "UPDATE users SET `online` = '0' WHERE id NOT IN ("+queryWhere+");";
@@ -901,4 +914,8 @@ function findMyUserPointer(socket){
         if(users[i].socket==socket) return i;
     }
     return -1;
+}
+
+function _log(server,method,body){
+    console.log("["+server+">"+method+" "+moment().format("YY-MM-DD HH:mm:ss")+"] "+body);
 }
