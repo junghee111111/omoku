@@ -93,7 +93,7 @@
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-var PRODUCTION = false;
+var PRODUCTION = true;
 var gSTATUS;
 var socket;
 var UI_loginForm, UI_LoginSubmitBtnNormalDOM, UI_LoginSubmitBtn;

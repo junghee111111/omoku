@@ -1,7 +1,7 @@
 const MATCHINTERVAL = 1000;
 const CLEANERINTERVAL = 1000;
 const PORT = 7376;
-const PRODUCTION = false;
+const PRODUCTION = true;
 /*ssl server settings*/
 
 var fs = require("fs");
