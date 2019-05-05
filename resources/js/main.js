@@ -19,6 +19,7 @@ var Timeout_hideMyGameChat,Timeout_hideEnemyGameChat;
 var Timeout_hideInvite = [];
 var SELECTED_ITEM = -1;
 var proccessPurchasesData;
+var orientation_detected = 0;
 const GOLD_WIN = 300;
 const GOLD_LOSE = 350;
 const GOLD_PANALTY = 400;
@@ -254,7 +255,7 @@ jQuery(document).ready(function(){
         UI_RegisterForm = $("#registerform");
         UI_RegisterSubmitBtn = UI_RegisterForm.find("button[type='submit']");
         UI_RegisterSubmitBtnNormalDOM = UI_RegisterSubmitBtn.html();
-
+        
         proccessPurchasesData = ((data)=>{
             var DOM = '';
             if(data){
@@ -290,12 +291,12 @@ jQuery(document).ready(function(){
         var afterPing = function(data,textStatus,jqXHR){
             if(data.loggedIn){
                 procAfterLoginChecked(data);
+                refreshPingData(data);
             }else{
                 //$("section.login").fadeIn();
                 procAfterLoginChecked(data);
                 doOnOrientationChange();
             }
-            refreshPingData(data);
         };
         AJAX_API_PING(afterPing);
 
@@ -420,32 +421,39 @@ function procAjaxError(error){
     console.log("응답메시지 : "+error.responseText);
 }
 
+function connection_refused(e){
+    console.log("CONNECTION FAILED");
+    showToast("게임 서버에 연결할 수 없습니다.<br/>"+e,"fa-ban",false,true);
+}
+
 function procAfterLoginChecked(data){
     showToast("게임 서버 접속 허가 대기 중..");
     try{
         if(PRODUCTION){
-            socket = io("https://www.omoku.net:7376");
+            socket = io("https://www.omoku.net:7376",connection_refused);
         }else{
-            socket = io("//localhost:7376");
+            socket = io("//localhost:7376",connection_refused);
         }
-    
+        auth = data;
+        if(auth.loggedIn==true){
+            $("*[omoku-data='name']").html(auth.User.name);
+        }
+        allocatePacketProcessor();
     }catch(e){
-        console.log("CONNECTION FAILED");
-        showToast("게임 서버에 연결할 수 없습니다.<br/>서버 점검중일 수 있습니다.","fa-ban",false,true);
+        connection_refused();
     }
-    auth = data;
-    if(auth.loggedIn==true){
-        $("*[omoku-data='name']").html(auth.User.name);
-    }
-    allocatePacketProcessor();
+    
+    
 }
 
 function allocatePacketProcessor(){
     /*
     PAKCET PROCESSING VIA OPCODE
     */
-
-   socket.on('disconnect',function(packet){
+    socket.on('connect_error',function(err){
+        connection_refused(err);
+    })
+    socket.on('disconnect',function(packet){
         //HANDSHAKE PACKET
         console.log("Socket connection has been closed..");
         $("section.login").hide();
@@ -454,6 +462,13 @@ function allocatePacketProcessor(){
         if(!disconnectReason){
             showToast("연결이 끊어져 재접속 시도 중..<br/>이유 : "+packet+"<br/><a href='/'>여기를 눌러 강제 재접속</a>","fa-spinner",true,true)
         }
+    });
+
+    socket.on('reconnect',function(packet){
+        //HANDSHAKE PACKET
+        console.log("Reconnected!");
+        hideToast();
+        $("section.lobby").show();
     });
 
     socket.on('HANDSHAKEREQ',function(packet){
@@ -467,16 +482,17 @@ function allocatePacketProcessor(){
         //ACCEPTED PACKET
         console.log("GAME SERVER ACCEPTED!");
         hideToast();
-        $("section.login").fadeOut(500,function(){
-            gSTATUS = 2;
-            $("section.lobby").fadeIn();
-        });
+        $("section.lobby").fadeIn();
+        gSTATUS = 2;
     });
 
     socket.on('COUNTER',function(packet){
         //COUNTER PACKET
         console.log("COUNTER PACKET ARRIVED : "+packet);
-        $("*[omoku-data='counter']").html(packet);
+        $("*[omoku-data='counter']").html(packet.all);
+        $("*[omoku-data='counter/wait']").html(packet.wait);
+        $("*[omoku-data='counter/matching']").html(packet.matching);
+        $("*[omoku-data='counter/ingame']").html(packet.ingame);
     });
 
     socket.on('CHAT',function(packet){
@@ -1244,12 +1260,12 @@ document.addEventListener("touchmove",function(event){
 
 /*휴대폰 방향 체크 */
 function doOnOrientationChange() {
-    console.log(window.orientation);
+    console.log(window.orientation+"/"+orientation_detected);
     if(window.orientation==90||window.orientation==-90){
-        showToast("&nbsp;폰을 90도 돌려 세로 방향으로 잡아주세요!","fa-mobile-alt",true,false,1);
-    }else{
-        hideToast();
+        alert("폰을 세로 방향으로 잡아주세요!");
+        //showToast("&nbsp;폰을 90도 돌려 세로 방향으로 잡아주세요!","fa-mobile-alt",true,false,1);
     }
+    orientation_detected++;
 }
 
 window.addEventListener('orientationchange', doOnOrientationChange);

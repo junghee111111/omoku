@@ -24,7 +24,7 @@
 </section>
 <!--인게임-->
 
-<section class="lobby" style="display:block;">
+<section class="lobby" style="display:none;">
     <div class="logoWrapper">
         <img src="/img/logo.png">
         <?php
@@ -87,7 +87,8 @@
             <div class="card">
                 <h1>
                     <span class="fa fa-comments"></span>&nbsp;
-                    로비 채팅 - <span omoku-data="counter"></span> 명 접속중
+                    로비 채팅 - <span omoku-data="counter"></span> 명 
+                    <small><strong>매칭참가중</strong> <span omoku-data="counter/matching"></span> <strong>게임중</strong> <span omoku-data="counter/ingame"></span></small>
                 </h1>
                 <textarea readonly id="chatContents">게임 서버에 연결하는 중..</textarea>
                 <input maxlength="40" type="text" placeholder="여기에 채팅 입력 후 엔터키로 전송" id="chatInput"/>

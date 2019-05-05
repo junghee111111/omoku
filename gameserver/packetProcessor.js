@@ -50,7 +50,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
 
         socket.emit("HANDSHAKEREQ");//특정 클라에겐 악수 요청..
 
-        io.emit("COUNTER",users.length);//전체 클라에게 현재 들어온사람 쏘기
+        io.emit("COUNTER",counter());//전체 클라에게 현재 들어온사람 쏘기
 
         socket.on('CHAT',function(chat){//채팅
             var user = findMyUser(socket);
@@ -110,7 +110,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
 
                             if(results[0].online==1){
                                 //이미 접속중..
-                                user.userinfo = null;
+                                
                                 disconnectPlayer(socket,"0x01/3","이미 접속중인 아이디 입니다. 브라우저의 다른 탭을 확인해 보세요. <a href='/auth/logout'>로그아웃</a>",user);
                                 _log("MASTER","HANDSHAKEADDI 0x01/3",socket.id+" ㄴ("+user.userinfo.name+"/"+user.userinfo.id+") 이미 접속중인 아이디 접근 시도");
                                 return;
@@ -152,9 +152,9 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             var user = findMyUser(socket);
             try{
                 if(user.userinfo){
-                    console.log(user.userinfo.name+" 유저가 퇴장을 시도합니다..");
-                }else{console.log("[알수없는익명] 유저가 퇴장을 시도합니다..");
-
+                    _log("MASTER","DISCONNECT",user.userinfo.name+" 유저가 퇴장을 시도합니다..");
+                }else{
+                    _log("MASTER","DISCONNECT","[알수없는익명] 유저가 퇴장을 시도합니다..");
                 }
                 //user.lastping = moment();
                 clearPlayer(user);
@@ -513,7 +513,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                     console.log("[USERSYNC] 에러 3 "+query3+"/"+error);
                     return;
                 }
-                console.log("[USERSYNC] 사람이 없어서 전체 offline 설정");
+                //console.log("[USERSYNC] 사람이 없어서 전체 offline 설정");
             });
         }
 
@@ -544,6 +544,8 @@ function makeRoom(userObj1,userObj2){
 
     userObj1.socket.join(room);
     userObj2.socket.join(room);
+
+    io.emit("CHAT","[서버] "+userObj1.userinfo.name+" VS "+userObj2.userinfo.name+" 오목 대전을 시작합니다!");//환영 메시지
 
     console.log("[MAKEROOM] ["+rooms.length+"] "+userObj1.userinfo.name+"("+userObj1.userinfo.id+") VS "+userObj2.userinfo.name+"("+userObj2.userinfo.id+") : 매치 시작!");
 }
@@ -854,24 +856,27 @@ function clearPlayer(user){
         for(var i = 0;i<users.length;i++){
             if(users[i].socket==user.socket){
                 var target = i;
-                if(users[target].userinfo){
+                if(users[target].userinfo!=null){
+
                     var QUERY_SET_USER_OFFLINE = db.query("UPDATE users SET online = '0' WHERE id = ?",
                     [users[target].userinfo.id],
                     function(error,results,fields){
                         if(error){
-                            console.log(users[target].userinfo.name+" 유저를 지우지 못했습니다.");
+                            _log("MASTER","CLEARPLAYER",users[target].userinfo.name+" 유저를 지우지 못했습니다.");
                         }
                         if(hasRoomIndex>-1){
                             closeRoom(io,db,hasRoomIndex,"DISCONNECT",user.userinfo.id);
                         }
+
                         users.splice(target,1);
-                        io.emit("COUNTER",users.length);
-                        console.log("["+users.length+"] "+user.userinfo.name+" 유저 스택에서 제거 완료");
+                        
+                        io.emit("COUNTER",counter());
+                        _log("MASTER","CLEARPLAYER","["+users.length+"] "+user.userinfo.name+" 유저 스택에서 제거 완료");
                     });
                 }else{
                     users.splice(target,1);
-                    io.emit("COUNTER",users.length);
-                    console.log("["+users.length+"] [알수없는익명] 유저 스택에서 제거 완료");
+                    io.emit("COUNTER",counter());
+                    _log("MASTER","CLEARPLAYER","["+users.length+"] [알수없는익명] 유저 스택에서 제거 완료");
                 }
             }
         }
@@ -916,6 +921,33 @@ function findMyUserPointer(socket){
     return -1;
 }
 
+function counter(){
+    var obj = {};
+    var ww = 0;
+    var mm = 0;
+    var gg = 0;
+    for(var i = 0;i<users.length;i++){
+        /*
+        1,2 대기중
+        3 매칭 대기
+        4 게임중
+        */
+       
+        if(users[i].status == 1||users[i].status == 2){
+            ww++;
+        }else if(users[i].status == 3){
+            mm++;
+        }else if(users[i].status == 4){
+            gg++;
+        }
+    }
+    obj.all = users.length;
+    obj.wait = ww;
+    obj.matching = mm;
+    obj.ingame = gg;
+    return obj;
+}
+
 function _log(server,method,body){
-    console.log("["+server+">"+method+" "+moment().format("YY-MM-DD HH:mm:ss")+"] "+body);
+    console.log("["+server+" / "+method+" "+moment().format("YY-MM-DD HH:mm:ss")+"] "+body);
 }
