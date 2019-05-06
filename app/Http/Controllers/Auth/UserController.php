@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Auth;
 use DB;
+use App\User;
 
 class UserController extends Controller
 {
@@ -21,9 +22,14 @@ class UserController extends Controller
                 $response["msg"] = "골드가 부족합니다.";
             }else{
                 $clearname = mb_substr($request->name,0,6);
-                DB::table('users')->where('id',Auth::user()->id)->decrement('gold',500,['name'=>$clearname]);
-                $response["success"] = true;
-                $response["msg"] = null;
+                $exist = User::where('name',$clearname)->count();
+                if($exist>0){
+                    $response["msg"] = "이미 누군가 사용중인 이름입니다.";
+                }else{
+                    DB::table('users')->where('id',Auth::user()->id)->decrement('gold',500,['name'=>$clearname]);
+                    $response["success"] = true;
+                    $response["msg"] = null;
+                }
             }
         }else{
             $response["msg"] = "권한이 없습니다!";
