@@ -87,8 +87,8 @@
             <div class="card">
                 <h1>
                     <span class="fa fa-comments"></span>&nbsp;
-                    로비 채팅 - <span omoku-data="counter"></span> 명 
-                    <small><strong>매칭참가중</strong> <span omoku-data="counter/matching"></span> <strong>게임중</strong> <span omoku-data="counter/ingame"></span></small>
+                    로비 <span omoku-data="counter"></span> 명 
+                    <small style="float:right;"><strong>매칭참가중</strong> <span omoku-data="counter/matching"></span> <strong>게임중</strong> <span omoku-data="counter/ingame"></span></small>
                 </h1>
                 <textarea readonly id="chatContents">게임 서버에 연결하는 중..</textarea>
                 <input maxlength="40" type="text" placeholder="여기에 채팅 입력 후 엔터키로 전송" id="chatInput"/>
@@ -101,15 +101,11 @@
                         <span class="fas fa-exclamation-circle"></span>&nbsp;
                         팁
                     </h1>
-                    <p>
-                    <span style="font-size:16px;color:skyblue;">
-                        게임 중 바둑판 아래가 잘리면 화면을 아래로 스크롤 하세요.
-                    </span>
-                    <br/>
-                    화면 오른쪽이 잘리는 분들은 <strong class="colorRed" style="display:inline">두 손가락으로 화면을 끝까지 줌 아웃</strong>한 상태로 이용하세요!
-                    <br />
-                    개발자 이메일 : <a href="mailto://tokki.lab@gmail.com">tokki.lab@gmail.com</a>
-                    </p>
+                    <ul style="margin:0;padding-left:15px;">
+                        <li>게임 중 바둑판 아래가 잘리면 화면을 아래로 스크롤 하세요.</li>
+                        <li>화면 오른쪽이 잘리면 두손가락으로 화면을 줌 아웃 하세요.</li>
+                        <li>개발자 이메일 : <a href="mailto://tokki.lab@gmail.com">tokki.lab@gmail.com</a></li>
+                    </ul>
                 </div><!--팁-->
                 <?php
             }else{
@@ -208,12 +204,17 @@
         <section class="store segment">
             <div class="card white">
                 <h1>
-                    상점 <em class="fa fa-dot-circle gold">&nbsp;<span omoku-data='gold'></span></em> 소지
+                    <em class="fa fa-shopping-bag"></em>&nbsp;
+                    상점
+                    <span style="float:right;">
+                    <em class="fa fa-dot-circle gold">&nbsp;<span omoku-data='gold'></span></em> 소지
+                    </span>
                 </h1>
                 <div class="storeBoard">
                     <ul class="menu">
                         <li type="dol" class="on">바둑돌</li>
                         <li type="board">바둑판</li>
+                        <li type="item">게임아이템</li>
                     </ul>
                     <ul class="item">
                         
@@ -224,6 +225,7 @@
         <section class="account segment">
             <div class="card white">
                 <h1>
+                    <span class="fas fa-briefcase"></span>&nbsp;
                     인벤토리
                 </h1>
                 <div class="inventory">
@@ -234,6 +236,7 @@
             </div>
             <div class="card white">
                 <h1>
+                <span class="fa fa-user-circle"></span>&nbsp;
                     계정
                 </h1>
                 <?php

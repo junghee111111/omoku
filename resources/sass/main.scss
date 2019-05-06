@@ -496,8 +496,8 @@ div.card{
 }
 section.lobby{
     .body{
-        overflow-y:scroll;
-        height:calc(100vh - 190px);
+        overflow-y:auto;
+        padding-bottom:110px;
         .segment{
             display:none;
             .accountBoard{
@@ -526,11 +526,16 @@ section.lobby{
                 button{
                     display:block;
                     width:100%;
-                    color:black;
-                    padding:5px;
                     border:none;
-                    background-color: rgba(0,0,0,.1);
-                    border-radius: 4px;
+                    background: #00c6ff;  /* fallback for old browsers */
+                    background: -webkit-linear-gradient(to right, #0072ff, #00c6ff);  /* Chrome 10-25, Safari 5.1-6 */
+                    background: linear-gradient(to right, #0072ff, #00c6ff); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+                    color:white;
+                    text-shadow:0px 1px 1px rgba(0,0,0);
+                    border-radius:4px;
+                    border:none;
+                    padding:4px 7px;
+                    margin-right:5px;
                     margin-top: 8px;
                 }
             }
@@ -577,7 +582,7 @@ section.lobby{
                     border-radius:4px;
                     box-sizing: border-box;
                     li{
-                        width:49.5%;
+                        width:31%;
                         padding:10px 0;
                         margin:0;
                         text-align:center;

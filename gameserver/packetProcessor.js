@@ -166,14 +166,16 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
         socket.on('MATCHIN',function(reason){//매치 대기열 참여
             var user = findMyUser(socket);
             user.lastping = moment();
-            console.log("["+user.userinfo.name+"] 매치 참여");
+            _log("MASTER","MATCHIN","["+user.userinfo.name+"] 매치 참여");
+            io.emit("COUNTER",counter());
             user.status=3;
         });
 
         socket.on('MATCHOUT',function(reason){//매치 대기열 퇴장
             var user = findMyUser(socket);
             user.lastping = moment();
-            console.log("["+user.userinfo.name+"] 매치에서 빠짐");
+            _log("MASTER","MATCHOUT","["+user.userinfo.name+"] 매치에서 빠짐");
+            io.emit("COUNTER",counter());
             user.status=2;
         });
 
@@ -230,6 +232,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                         console.log("ㄴ 플레이어 0 : "+rooms[roomIndex].players[0].userinfo.name+"("+rooms[roomIndex].players[0].userinfo.id+")");
                         console.log("ㄴ 플레이어 1 : "+rooms[roomIndex].players[1].userinfo.name+"("+rooms[roomIndex].players[1].userinfo.id+")");
                         io.to(user.room).emit("RSPSTART");
+                        io.emit("COUNTER",counter());//전체 카운팅 보내기
                     }
                 }
             },2000);
@@ -454,7 +457,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             if(users[i].status==3){
                 countInMatch++;
                 usersInMatch.push(users[i]);
-                console.log("[매치메이커] "+users[i].userinfo.name+"("+users[i].userinfo.id+") 님이 들어옴.");
+                //console.log("[매치메이커] "+users[i].userinfo.name+"("+users[i].userinfo.id+") 님이 들어옴.");
             }
         }
         //console.log("[매치메이커] "+usersInMatch.length+"/"+users.length+" 명 매치 대기 감지됨.");
@@ -552,7 +555,7 @@ function makeRoom(userObj1,userObj2){
 
 function getUserIndexbyId(id){
     for(var i=0;i<users.length;i++){
-        if(users[i]!=null&&(users[i].userinfo.id == id)){
+        if(users[i]!=null&&users[i].userinfo!=null&&(users[i].userinfo.id == id)){
             return i;
         }
     }

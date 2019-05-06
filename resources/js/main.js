@@ -144,6 +144,7 @@ function interveneClose(){
 function refreshPingData(data){
     if(data.loggedIn){
         auth = data;
+        
         console.log(auth);
         $("*[omoku-data='name']").html(data.User.name);
         $("*[omoku-data='wins']").html(data.User.wins);
@@ -271,10 +272,11 @@ jQuery(document).ready(function(){
                     DOM += '<p>'+moment(item.expire_date).diff(moment(),'days')+'일 남음</p>';
                     DOM += '<button class="Btn_useItem" purchaseid="'+item.id+'">';
                     if(item.item.type=="dol"){
-                        if(auth.User.dol&&(auth.User.dol.item.id==item.id)){
-                            DOM += '착용중';
+                        console.log(auth.User.dol);
+                        if(auth.User.dol&&(auth.User.dol.id==item.id)){//purchase id 임
+                            DOM += '<span class="fa fa-check"></span>&nbsp;착용중';
                         }else{
-                            DOM += '착용하기';
+                            DOM += '<span class="fas fa-mitten"></span>&nbsp;착용하기';
                         }
                     }
                     DOM += '</button>';
@@ -1215,8 +1217,8 @@ function callUseItem(purchaseid,type){
         if(response.success){
             showModal(3,"착용했습니다.");
             AJAX_API_PING();
-            $("li[itemtype='"+type+"'] button").html("착용하기");
-            $("button[purchaseid='"+purchaseid+"']").html("착용중");
+            $("li[itemtype='"+type+"'] button").html('<span class="fas fa-mitten"></span>&nbsp;착용하기');
+            $("button[purchaseid='"+purchaseid+"']").html('<span class="fa fa-check"></span>&nbsp;착용하기');
         }else{
             showModal(3,response.message);
         }
