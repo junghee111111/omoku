@@ -167,16 +167,18 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
             var user = findMyUser(socket);
             user.lastping = moment();
             _log("MASTER","MATCHIN","["+user.userinfo.name+"] 매치 참여");
-            io.emit("COUNTER",counter());
+            
             user.status=3;
+            io.emit("COUNTER",counter());
         });
 
         socket.on('MATCHOUT',function(reason){//매치 대기열 퇴장
             var user = findMyUser(socket);
             user.lastping = moment();
             _log("MASTER","MATCHOUT","["+user.userinfo.name+"] 매치에서 빠짐");
-            io.emit("COUNTER",counter());
+            
             user.status=2;
+            io.emit("COUNTER",counter());
         });
 
         socket.on('ROOMENTER',function(packet){//최초로 게임 룸에 입장시..
