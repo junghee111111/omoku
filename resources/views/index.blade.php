@@ -94,21 +94,7 @@
                 <input maxlength="40" type="text" placeholder="여기에 채팅 입력 후 엔터키로 전송" id="chatInput"/>
             </div><!--채팅-->
             <?php
-            if(Auth::check()){
-                ?>
-                <div class="card">
-                    <h1>
-                        <span class="fas fa-exclamation-circle"></span>&nbsp;
-                        팁
-                    </h1>
-                    <ul style="margin:0;padding-left:15px;">
-                        <li>게임 중 바둑판 아래가 잘리면 화면을 아래로 스크롤 하세요.</li>
-                        <li>화면 오른쪽이 잘리면 두손가락으로 화면을 줌 아웃 하세요.</li>
-                        <li>개발자 이메일 : <a href="mailto://tokki.lab@gmail.com">tokki.lab@gmail.com</a></li>
-                    </ul>
-                </div><!--팁-->
-                <?php
-            }else{
+            if(!Auth::check()){
                 ?>
                 <div class="titlecard" id="loginformWrapper">
                     <h1>
@@ -180,6 +166,31 @@
             ?>
             <div class="card">
                 <h1>
+                    <span class="fas fa-users"></span>&nbsp;
+                    현재 접속자 목록 ( <span omoku-data="counter"></span> 명 )
+                </h1>
+                <ul id="currentList">
+                </ul>
+            </div><!--팁-->
+            <?php
+            if(Auth::check()){
+                ?>
+                <div class="card">
+                    <h1>
+                        <span class="fas fa-exclamation-circle"></span>&nbsp;
+                        팁
+                    </h1>
+                    <ul style="margin:0;padding-left:15px;">
+                        <li>게임 중 바둑판 아래가 잘리면 화면을 아래로 스크롤 하세요.</li>
+                        <li>화면 오른쪽이 잘리면 두손가락으로 화면을 줌 아웃 하세요.</li>
+                        <li>개발자 이메일 : <a href="mailto://tokki.lab@gmail.com">tokki.lab@gmail.com</a></li>
+                    </ul>
+                </div><!--팁-->
+                <?php
+            }
+            ?>
+            <div class="card">
+                <h1>
                 <span class="fa fa-bullhorn"></span>&nbsp;
                     공지사항
                 </h1>
@@ -214,7 +225,8 @@
                     <ul class="menu">
                         <li type="dol" class="on">바둑돌</li>
                         <li type="board">바둑판</li>
-                        <li type="item">게임아이템</li>
+                        <li type="item">아이템</li>
+                        <li type="bg">명판</li>
                     </ul>
                     <ul class="item">
                         

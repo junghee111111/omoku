@@ -128,6 +128,7 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                                 user.status = 2;
                                 var welcomeMessage = "[환영] "+moment().format('서버 시각 MMMM Do YYYY, h:mm:ss a');
                                 socket.emit("CHAT",welcomeMessage);//환영 메시지
+                                io.emit("COUNTER",counter());
                                 _log("MASTER","HANDSHAKEADDI",socket.id+" ("+user.userinfo.name+"/"+user.userinfo.id+") 최종 서버 접근 허가 완료.");
                             });
 
@@ -142,6 +143,12 @@ exports = module.exports = function(_io,MATCHINTERVAL,_db,CLEANERINTERVAL){
                     socket.emit("ACCEPTED",userinfo);
                     var welcomeMessage = "[환영] "+moment().format('서버 시각 MMMM Do YYYY, h:mm:ss a');
                     socket.emit("CHAT",welcomeMessage);//환영 메시지
+
+                    user.userinfo = {"name":"비회원"+socket.id.substr(0,3)};
+                    var userIndex = getUserIndexBySocket(user.socket);
+                    user.loggedIn = false;
+                    users[userIndex] = user;
+                    io.emit("COUNTER",counter());
                 }
             }catch(e){
                 _log("MASTER","HANDSHAKEADDI ERR",socket.id+":"+e);
@@ -719,8 +726,10 @@ function processPlace(io,db,ridx,user,posX,posY){
             //게임 중단 패킷 전송
             io.to(user.room).emit('PLACE',{x:posX,y:posY,stone:stone,who:rooms[ridx].players[rooms[ridx].current].userinfo.id});//착수 패킷
             io.to(user.room).emit('ENDGAME',{testimony:checkEnd,winner:rooms[ridx].players[rooms[ridx].current].userinfo.id});//게임 끝 패킷
+            io.emit("CHAT","[서버] "+rooms[ridx].players[rooms[ridx].current].userinfo.name+" VS "+rooms[ridx].players[theOp(rooms[ridx].current)].userinfo.name+" 게임에서 "+rooms[ridx].players[rooms[ridx].current].userinfo.name+" 님이 승리했습니다.");//환영 메시지
             var winner = rooms[ridx].players[rooms[ridx].current].userinfo.id;
             var loser = rooms[ridx].players[theOp(rooms[ridx].current)].userinfo.id;
+            
             
             var QUERY_UPDATE_WINNER_RECORD = 
             db.query("UPDATE users SET `gold` = `gold`+"+gold("WIN")+" , `wins` = `wins`+1 WHERE `id` = '?';",
@@ -931,13 +940,14 @@ function counter(){
     var ww = 0;
     var mm = 0;
     var gg = 0;
+    var simplifiedUserList = [];
     for(var i = 0;i<users.length;i++){
+        var name = "";
         /*
         1,2 대기중
         3 매칭 대기
         4 게임중
         */
-       
         if(users[i].status == 1||users[i].status == 2){
             ww++;
         }else if(users[i].status == 3){
@@ -945,11 +955,18 @@ function counter(){
         }else if(users[i].status == 4){
             gg++;
         }
+        if(users[i].userinfo){
+            name = users[i].userinfo.name;
+        }else{
+            name = "연결중..."
+        }
+        simplifiedUserList.push({"name":name,"status":users[i].status});
     }
     obj.all = users.length;
     obj.wait = ww;
     obj.matching = mm;
     obj.ingame = gg;
+    obj.users = simplifiedUserList;
     return obj;
 }
 

@@ -17,8 +17,8 @@ section.login,section.lobby,section.ingame{
     background: -webkit-linear-gradient(to right, #3c1053, #ad5389);  /* Chrome 10-25, Safari 5.1-6 */
     background: linear-gradient(to right, #3c1053, #ad5389); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     width:100%;
-    height:101%;
-    position:absolute;
+    height:100%;
+    position:fixed;
     left:0;
     top:0;
     z-index:-2;
@@ -493,6 +493,37 @@ div.card{
         outline:none;
         padding:5px;
     }
+    ul#currentList{
+        margin:0;
+        padding:0;
+        overflow:auto;
+        max-height:90px;
+        li{
+            list-style:none;
+            margin:0;
+            padding:5px 10px;
+            background-color:#F7F7F7;
+            border-radius:3px;
+            display:inline-block;
+            margin-top:5px;
+            width:49%;
+            margin-left:1%;
+            small{
+                text-align:right;
+                float:right;
+                vertical-align: -webkit-baseline-middle;
+            }
+        }
+        li.status2{
+            background-color:#c8f3b7;
+        }
+        li.status3{
+            background-color:#d6d9fb;
+        }
+        li.status4{
+            background-color:#ff9a9a;
+        }
+    }
 }
 section.lobby{
     .body{
@@ -534,7 +565,7 @@ section.lobby{
                     text-shadow:0px 1px 1px rgba(0,0,0);
                     border-radius:4px;
                     border:none;
-                    padding:4px 7px;
+                    padding:7px;
                     margin-right:5px;
                     margin-top: 8px;
                 }
@@ -582,7 +613,7 @@ section.lobby{
                     border-radius:4px;
                     box-sizing: border-box;
                     li{
-                        width:31%;
+                        width:24%;
                         padding:10px 0;
                         margin:0;
                         text-align:center;

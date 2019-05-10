@@ -495,6 +495,21 @@ function allocatePacketProcessor(){
         $("*[omoku-data='counter/wait']").html(packet.wait);
         $("*[omoku-data='counter/matching']").html(packet.matching);
         $("*[omoku-data='counter/ingame']").html(packet.ingame);
+        var DOM = "";
+        for(var i = 0;i<packet.users.length;i++){
+            var status = "";
+            if(packet.users[i].status=="1"){
+                status = "비회원";
+            }else if(packet.users[i].status=="2"){
+                status = "대기";
+            }else if(packet.users[i].status=="3"){
+                status = "매칭중";
+            }else if(packet.users[i].status=="4"){
+                status = "게임중";
+            }
+            DOM += "<li class='status"+packet.users[i].status+"'>"+packet.users[i].name+"<small>"+status+"</small></li>";
+        }
+        $("#currentList").html(DOM);
     });
 
     socket.on('CHAT',function(packet){
@@ -777,6 +792,7 @@ function allocatePacketProcessor(){
         clearInterval(globalTurnTimer);
         var c = "pos"+packet.x+"-"+packet.y;
         $(".board>button").removeClass("on");
+        
         $(".board>button."+c).addClass("on");
         $(".board>button."+c).addClass(packet.stone);
         if(packet.who==auth.User.id){
@@ -789,6 +805,8 @@ function allocatePacketProcessor(){
             //적이 놓은것인가?
             if(enemy.dol){
                 $(".board>button."+c).addClass(enemy.dol.item.image);
+            }else{
+
             }
         }
     });
@@ -853,6 +871,9 @@ function allocatePacketProcessor(){
         $("section.gameBoard>.board>button").removeClass("white");
         $("section.gameBoard>.board>button").removeClass("black");
         $("section.gameBoard>.board>button").removeClass("on");
+        $(".board>button").removeClass (function (index, css) {
+            return (css.match (/(^|\s)dol\S+/g) || []).join(' ');
+        });
 
         setTimeout(function(){
             interveneClose();
@@ -1218,7 +1239,7 @@ function callUseItem(purchaseid,type){
             showModal(3,"착용했습니다.");
             AJAX_API_PING();
             $("li[itemtype='"+type+"'] button").html('<span class="fas fa-mitten"></span>&nbsp;착용하기');
-            $("button[purchaseid='"+purchaseid+"']").html('<span class="fa fa-check"></span>&nbsp;착용하기');
+            $("button[purchaseid='"+purchaseid+"']").html('<span class="fa fa-check"></span>&nbsp;착용중');
         }else{
             showModal(3,response.message);
         }
