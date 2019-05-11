@@ -235,6 +235,9 @@
             </div>
         </section>
         <section class="account segment">
+        <?php
+            if(Auth::check()){
+                ?>
             <div class="card white">
                 <h1>
                     <span class="fas fa-briefcase"></span>&nbsp;
@@ -244,6 +247,47 @@
                     <ul class="purchaseList">
 
                     </ul>
+                </div>
+            </div>
+            <div class="card white">
+                <h1>
+                    <span class="fas fa-list-alt"></span>&nbsp;
+                    최근 게임 전적
+                </h1>
+                <div class="recordsBoard">
+                    <table>
+                        <thead>
+                            <td>상대</td>
+                            <td>대전시각</td>
+                            <td>결과</td>
+                        </thead>
+                        <?php
+                        $records = Auth::user()->records()->load('winner')->load('loser');
+                        foreach($records as $record){
+                            ?>
+                            <tr>
+                                <td>
+                                <?php
+                                if($record->win==Auth::user()->id){
+                                    echo $record->loser->name;
+                                }else{
+                                    echo $record->winner->name;
+                                }
+                                ?>
+                                </td>
+                                <td>{{$record->created_at}}</td>
+                                <td><?php
+                                if($record->win==Auth::user()->id){
+                                    echo "<strong style='color:green'>승리</strong>";
+                                }else{
+                                    echo "<strong style='color:red'>패배</strong>";
+                                }
+                                ?></td>
+                            </tr>
+                            <?php
+                        }
+                        ?>
+                    </table>
                 </div>
             </div>
             <div class="card white">
@@ -306,7 +350,9 @@
                 ?>
                 
             </div>
-            
+            <?php
+            }
+            ?>
         </section>
         <div class="startBtnWrapper">
         <?php

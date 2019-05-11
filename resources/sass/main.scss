@@ -570,6 +570,32 @@ section.lobby{
                     margin-top: 8px;
                 }
             }
+            .recordsBoard{
+                table{
+                    
+                    width:100%;
+                    text-align:center;
+                    thead{
+                        td{
+                            padding:6px 3px;
+                            background-color:#F5F5F5;
+                            
+                        }
+                        td:first-child{
+                            border-radius:5px 0 0 5px;
+                        }
+                        td:last-child{
+                            border-radius:0px 5px 5px 0px;
+                        }
+                        font-weight:bold;
+                    }
+                    tr{
+                        td{
+                            padding:5px 3px;
+                        }
+                    }
+                }
+            }
             .rankBoard{
                 ul.ranker{
                     margin:0;

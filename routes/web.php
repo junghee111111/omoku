@@ -30,8 +30,6 @@ Route::post('auth/register','Auth\RegisterController@postRegister');
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-// Records
-Route::resource('records','RecordsController');
 
 // APIs
 Route::get('api/ping','APIController@ping');

@@ -34,4 +34,7 @@ class User extends Authenticatable
     public function board(){
         return $this->hasOne(Purchase::class,'id','board');
     }
+    public function records(){
+        return Record::where('win',$this->id)->orWHere('lose',$this->id)->limit(10)->get();
+    }
 }

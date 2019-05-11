@@ -1187,6 +1187,8 @@ $("nav.bottom>ul>li").click(function(){
                 callBuyItem($(this).attr("itemid"));
             })
         });
+        $("ul.menu>li").removeClass("on");
+        $("ul.menu>li[type='dol']").addClass("on");
         AJAX_SHOP_INDEX(processItemsData);
     }else if(seg=="account"){
         //상점 세그먼트 요청
@@ -1223,7 +1225,7 @@ function callBuyItem(itemid){
     var triggerBuyItem = function(){
         var afterBuy = function(response){
             if(response.success){
-                showModal(3,"구매를 완료했습니다.");
+                showModal(3,"구매를 완료했습니다. 우측 하단 계정 탭의 인벤토리에서 착용해주세요.");
                 AJAX_API_PING();
             }else{
                 showModal(3,response.message);

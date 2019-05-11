@@ -54,14 +54,18 @@ class ShopController extends Controller
             if(Auth::User()->gold>$price){
                 //돈이 여유로우면..
                 $alreadyPurchase = Purchase::where("user_id",Auth::user()->id)->where("item_id",$item->id)->where("expire_date",">",DB::raw('NOW()'))->count();
-                if($alreadyPurchase>0){
+                if($alreadyPurchase>0&&($item->type!="item")){
                     $response["message"] = "이미 구매한 아이템입니다.";
                 }else{
                     DB::table('users')->where('id',Auth::user()->id)->decrement('gold',$price);
 
                     //purchase 객체 생성
                     $now = new DateTime();
-                    $expire_date = $now->add(new DateInterval('P7D'));//7일 더함
+                    if($item->type=="item"){
+                        $expire_date = $alreadyPurchase+1;
+                    }else{
+                        $expire_date = $now->add(new DateInterval('P7D'));//7일 더함
+                    }
 
                     $purchaseObj = new Purchase;
                     $purchaseObj->user_id = Auth::User()->id;

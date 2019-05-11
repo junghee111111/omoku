@@ -676,6 +676,32 @@ section.lobby .body .segment .accountBoard button {
   margin-top: 8px;
 }
 
+section.lobby .body .segment .recordsBoard table {
+  width: 100%;
+  text-align: center;
+}
+
+section.lobby .body .segment .recordsBoard table thead {
+  font-weight: bold;
+}
+
+section.lobby .body .segment .recordsBoard table thead td {
+  padding: 6px 3px;
+  background-color: #F5F5F5;
+}
+
+section.lobby .body .segment .recordsBoard table thead td:first-child {
+  border-radius: 5px 0 0 5px;
+}
+
+section.lobby .body .segment .recordsBoard table thead td:last-child {
+  border-radius: 0px 5px 5px 0px;
+}
+
+section.lobby .body .segment .recordsBoard table tr td {
+  padding: 5px 3px;
+}
+
 section.lobby .body .segment .rankBoard ul.ranker {
   margin: 0;
   padding: 0;
